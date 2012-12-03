@@ -1,0 +1,222 @@
+#!/bin/bash
+# Checks options for a script.
+# USAGE: checkArgs MODE [file] [file] [file] etc...
+#
+# possible MODEs are -p, -s, -f (with a file (list) or directory (list))
+#				     -l (with time)
+#
+
+fatal() {
+    # fatal - outputs a fatal error message to stderr and exits.
+    #     Uses the function error() to output the error message.
+    error $*
+    exit 1
+}
+
+error() {
+    # Outputs an error message to stderr.
+    # Keeps track of whether errors have been seen.
+    # SETS A GLOBAL VARIABLE errors_seen TO INDICATE AN ERROR HAS BEEN SEEN!
+    typeset progname=$(basename $0)
+    errors_seen=true
+    echo -e "$progname: error: $*" >&2
+	echo "$progname: usage: $progname { -p | -s | -f } list-of-files" >&2
+}
+
+checkArgs() {
+	# checkArgs tests to see if the first arguement is an acceptable mode. 
+	# This function takes one arguement: the mode ($1).
+    case "$1" in
+        -p) fatal "The '-p' option is not yet available." ;;
+        -s) fatal "The '-s' option is not yet available." ;;
+        -f) mode="file" ;;
+        -l)	fatal The -l option is not yet available. ;;
+         *) fatal Option unknown or missing ;;
+    esac
+}
+
+default_list() {
+    # default_list outputs the default list of things to work on
+	# if no files were given as arguements.  The default list consists
+	# of a list of visable items in the current directory. 
+    # It takes two arguments: the system ($1) and the type of things
+    #                         status is requested on ($2). 
+    # For assignment two, the only possibility for $2 is "file"
+    #                             and $1 (system) doesn't matter
+    typeset mode=$2 system=$1
+
+    # whatever goes to standard output is command-substituted 
+    # into the list
+    ls
+}
+
+dofile() {
+    # Generate status information for a single file on
+    #    the indicated system
+    # There are two arguments: $1 is the system; $2 is the file path
+    # I'm putting them in local variables for you
+    typeset file=$2 system=$1
+
+	# Check to see if all the files in the list exist.
+	if [ !-a "$1" ]; then
+		error $1 isn't a valid file.  It doesn't seem to exist.
+	fi
+
+	# Gets octal permissions if it's in Linux.
+	if [ "$system" = "Linux" ]; then  
+		typeset octalperms=`stat --format=%a $1`
+	fi
+
+	# Checks to see if the file is a directory. Directories are trouble.
+	if [ -d $1 ]; then
+		typeset filetype_char="d"
+
+		#Breaks up 'ls' into it's components (only for directories here)
+		#See descriptive variables  here to see what's grabbed by awk and sed.
+		typeset rawpermissions=`ls -dl $1 | awk '{ print $1 ; }'`
+		typeset links=`ls -dl $1 | awk '{ print $2 ; }'`
+		typeset username=`ls -dl $1 | awk '{ print $3 ; }'`
+		typeset groupname=`ls -dl $1 | awk '{ print $4 ; }'`
+		typeset filename=`ls -dl $1 | awk '{ print $9 ; }'`  
+		typeset uidnumeric=`ls -dln $1 | awk '{ print $3 ; }'`
+		typeset gidnumeric=`ls -dln $1 | awk '{ print $4 ; }'`
+		typeset sizeblocks=`ls -dls $1 | awk '{ print $1 ; }'`
+	
+		# Weedles out the symbolic permissions.
+		typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+	else
+		#Breaks up the 'ls' command into it's components
+		#See descriptive variables  here to see what's grabbed by awk and sed.
+		typeset rawpermissions=`ls -l $1 | awk '{ print $1 ; }'`
+		typeset links=`ls -l $1 | awk '{ print $2 ; }'`
+		typeset username=`ls -l $1 | awk '{ print $3 ; }'`
+		typeset groupname=`ls -l $1 | awk '{ print $4 ; }'`
+		typeset sizebytes=`ls -l $1 | awk '{ print $5 ; }'` 
+		typeset filename=`ls -l $1 | awk '{ print $9 ; }'`  
+		typeset uidnumeric=`ls -n $1 | awk '{ print $3 ; }'`
+		typeset gidnumeric=`ls -n $1 | awk '{ print $4 ; }'`
+		typeset sizeblocks=`ls -s $1 | awk '{ print $1 ; }'`
+
+		# Weedles out the type character and the symbolic permissions.
+		typeset filetype_char=`echo $rawpermissions | sed 's/r.*$//'`
+		typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+	fi
+
+	# 'Expands' the file type character extracted earlier 
+	# to be a user-friendly word. 
+	case "$filetype_char" in
+		-) typeset filetype="regular file" ;;
+		b) typeset filetype="block special file" ;;
+		c) typeset filetype="character special file" ;;
+		d) typeset filetype="directory" ;;
+		m) typeset filetype="XENIX shared data (memory)" ;;
+		n) typeset filetype="network special file" ;;
+		p) typeset filetype="fifo (named pipe)" ;;
+		s) typeset filetype="XENIX semaphore (socket)" ;;
+		l) typeset filetype="symbolic link" ;;
+		*) error filetype not detected.  What to do? ;;
+	esac
+
+##############################################################################
+##### To make the output look nice, I wanted to use the whole screen.    #####
+##### So that makes the 'if' statements here look messy.                            #####
+##### OUTPUT TO STDOUT: depending on the type:                           #####
+#####                                    directory, regular, or other    #####
+##############################################################################
+if [ "$filetype_char" = "d" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the directory '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "              Number of subdirectories: $links"
+echo "                    Owner of directory: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "         Directory's size in 1k blocks: $sizeblocks"
+
+elif [ "$filetype_char" = "-" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "                  File's size in bytes: $sizebytes"
+echo "              File's size in 1k blocks: $sizeblocks"
+
+else
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+
+fi
+}
+
+
+#---------------------------------------------
+# the main program
+
+# initialize our flag to indicate there have not been any errors
+errors_seen=false
+
+# Check the system we are on.
+# Warn user that this script is only guaranteed for Linux and HP-UX.
+system=`uname -s`
+if [ "$system" != "Linux" && "$system" != "HP-UX" ]; then
+	error WARNING! This script was only designed for Linux and HP-UX.
+fi
+
+# process the arguments
+# if there's not at least one argument, it's a fatal error.
+if [ $# -eq 0 ]; then
+	fatal An OPTION is required to run this program.
+fi
+
+# the first argument MUST be a valid option. Checked in a special function.
+checkArgs $1
+shift
+
+# If there was only one argument, function default_list generates the list
+# of things to work on. 
+# If there are more arguments, the list consists of the rest of the args. 
+if [ $# -ge 1 ]; then
+	list=$@
+else
+    # the function default_list outputs (to standard output)
+    # a list of the default things to work on.
+    list=$(default_list $system $mode)
+fi
+
+# Function dofile() is called for each item in list.
+for item in $list; do
+    dofile "$system" "$item"
+done
+
+# now simply exit with the exit status set depending on 
+# whether errors were encountered or not
+if errors_seen; then
+	exit 0
+else
+	exit 1

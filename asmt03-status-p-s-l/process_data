@@ -1,0 +1,110 @@
+#!/bin/bash
+# program name: process_data
+# grabs the 1st arguement, which should be a process number
+# I removed it...............
+
+process () {
+
+process=$1
+
+# test if arguement is valid
+testprocess=`ps -f "$process" | grep "$process"`
+if [ -z "$testprocess" ]; then
+echo   " ---------------------------------------------------------------------"
+echo   "                 '$process' isn't a process right now                 "
+echo   " ---------------------------------------------------------------------"
+
+
+# the last 6 processes result from the operation of this script, so
+# no report is made of them to the user.
+# AND the the last process to produce any data, that for this script
+# aka 'process_data' needs to be supressed.
+# i.e if $filename="process_data"; then don't do it
+non_processes="$non_processes $process"
+
+echo $non_processes
+
+
+
+
+else
+
+# Stores process's info from /proc/$process/stat
+stat_line=`cat /proc/"$process"/stat`
+
+# grabs the process's state character
+statechar=`echo $stat_line | cut -d' ' -f3`
+
+# Grabs the absolute path of the process that is running.
+# Watch out: the path of a shell script is likely just /bin/bash
+# but the path of most other processes should be where they reside
+# e.g. the sleep command resides at /bin/sleep
+path=`readlink /proc/$process/exe`
+if [ -z $path ]; then
+    path="unavailable"
+fi
+
+# watch out: if you're trying to capture a process of a program because
+# programs contain many processes, therefore, the program itself will
+# usually look like it's sleeping, when if fact any of it's commands
+# will likely be running.
+# translates the process's state into a readable form
+case "$statechar" in
+    R) state="running or runable" ;;
+    S) state=sleeping ;;
+    I) state=idle ;;
+    T) state=stopped ;;
+    Z) state=zombie ;;
+    D) state="disk wait" ;;
+    W) state="swapped out" ;;
+    N) state="niced: execution priority lowered" ;;
+    \<) state="niced: execution priority artificially raised" ;;
+    *) state="Sorry, I don't know that process state." ;;
+esac
+
+
+# Grabs process's name.  I appologise for using cut like this.
+filename=`echo $stat_line | cut -d' ' -f2 |
+                                       cut -d'(' -f2 | cut -d')' -f1`
+# Grabs process's parent's ID
+parent=`echo $stat_line | cut -d' ' -f4`
+
+# rss value was taken from 'ps' command because the ps man page indicates
+# that it returns the rss value in kilobytes. This program converts that
+# value to bytes to match the units of virtual memory given here in bytes.
+# The units that these commands produce are clearly verified by comparison
+# with /proc/$process/status.
+rss=$(( 1000*`ps -yl $process | grep "$process" | awk '{ print $8 ; }'` ))
+priority=`echo $stat_line | cut -d' ' -f18`
+nicenum=`echo $stat_line | cut -d' ' -f19`
+starttime=`ps -f "$process" | grep "$process" | awk '{ print $5 }'`
+virtmemsz=`echo $stat_line | cut -d' ' -f23`
+cputime=`ps u "$process" | grep "$process" | awk '{ print $3 ; }'`
+
+
+
+echo
+echo
+echo   " ---------------------------------------------------------------------"
+echo   "                 Information about the process '$process'             "
+echo   " ---------------------------------------------------------------------"
+printf "%15s %-15s\t%25s %-20s\n" "path:" $path "filename:" "$filename"
+printf "%15s %-15s\t%25s %-20s\n" "parent id:" $parent "rss (bytes):" $rss
+printf "%15s %-15s\t" "start time:" $starttime
+printf "%25s %-15s\n" "virtual memory (bytes):" $virtmemsz
+printf "%15s %-15s\t%25s %-20s\n" "nice number:" $nicenum "cpu time:" $cputime
+printf "%15s %-15s\t%25s %-20s\n" "priority:" $priority "state:" $state
+echo
+echo
+fi
+}
+
+if [ $# = 0 ]; then
+    list=`exec default_processes`
+else
+    list=$@
+fi
+
+for item in $list; do
+    process "$item"
+done

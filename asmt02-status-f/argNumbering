@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#usage: argNumbering -f arg1 arg2
+
+    case "$1" in
+        -f)
+            shift
+			echo $# ;;
+			#OK this prints the number of args after the shift was done
+			#--it doesn't print basename plus # of args after that
+	esac
+           	#if [ $# = 0 ]; then 
+				

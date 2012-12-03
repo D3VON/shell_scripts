@@ -1,0 +1,73 @@
+You can list your current enviroment with the env command. 
+Following are some of the common enviroment variables. 
+
+Enviroment Variable                   Meaning
+
+	DISPLAY				The machine where programs
+						you run will be displayed
+
+	EDITOR				Your default editor
+
+	HOME				Your home directory
+
+	HOSTNAME			The hostname of your system
+
+	HZ					The number of commands history
+						will "remember"
+
+	LOGNAME				The user name you are using
+
+	MAIL				Where your mail spool is located
+
+	MANPATH				The path the system searches 
+						for man pages
+	NNTPSERVER			The newsserver you are using
+
+	PATH				The path the system will search
+						for commands
+
+	PRINTER				Your default printer
+
+	SHELL				The shell you are using
+
+	USER				The user name you are using
+
+
+
+
+
+
+
+
+
+
+
+MY ACTUAL ENV'S ON HILLS (HP-UX)
+
+
+bash-2.04$ env
+PWD=/students/dmcbri01/cs260/man_pages
+TZ=PST8PDT
+HOSTNAME=hills
+MANPATH=/usr/share/man/%L:/usr/share/man:/usr/contrib/man/%L:/usr/contrib/man:/usr/local/man/%
+******************************************HP-UX has so many of these paths....ugh
+LESS=-efM
+USER=dmcbri01
+MACHTYPE=hppa2.0w-hp-hpux11.00
+ERASE=^H
+MAIL=/var/mail/dmcbri01
+BASH_ENV=/students/dmcbri01/.bashrc
+LOGNAME=dmcbri01
+SHLVL=1
+SHELL=/usr/bin/bash
+HOSTTYPE=hppa2.0w
+OSTYPE=hpux11.00
+HOME=/students/dmcbri01
+TERM=vt100
+PATH=/usr/bin:/usr/local/bin:/opt/ansic/bin:/usr/ccs/bin:/opt/perl5/bin:.....
+:/opt/clibpdf/bin:/opt/rsync/bin:/students/dmcbri01/bin:.
+******************************************HP-UX has so many of these paths....ugh
+
+SSH_TTY=/dev/pts/0
+_=/usr/bin/env
+OLDPWD=/pub/cs/gboyd/cs260/basics/diff

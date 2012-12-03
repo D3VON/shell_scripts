@@ -1,0 +1,518 @@
+/proc directory exploring
+
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 23619 22773  0 03:11 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ ls /proc
+1      22773  3758  3929  4011  bus          fs          locks       self
+10     23623  3770  3960  4054  cmdline      ide         mdstat      slabinfo
+11     3      3786  3978  4946  cpuinfo      interrupts  meminfo     stat
+1414   3334   3845  3999  5     devices      iomem       misc        swaps
+1422   3613   3857  4     6     dma          ioports     modules     sys
+15     3656   3878  4006  7     dri          irq         mounts      sysvipc
+16772  3660   3887  4007  73    driver       kcore       mtrr        tty
+2      3678   3897  4008  8     execdomains  kmsg        net         uptime
+22770  3697   3907  4009  9     fb           ksyms       partitions  version
+22772  3757   3918  4010  apm   filesystems  loadavg     pci
+[dmcbri01@moe process]$ ls -l /proc/22773
+total 0
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 cmdline
+lrwxrwxrwx    1 dmcbri01 users           0 Mar 29 03:14 cwd -> /home/pub/cs260gb/samples/process
+-r--------    1 dmcbri01 users           0 Mar 29 03:14 environ
+lrwxrwxrwx    1 dmcbri01 users           0 Mar 29 03:14 exe -> /bin/bash
+dr-x------    2 dmcbri01 users           0 Mar 29 03:14 fd
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 maps
+-rw-------    1 dmcbri01 users           0 Mar 29 03:14 mem
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 mounts
+lrwxrwxrwx    1 dmcbri01 users           0 Mar 29 03:14 root -> /
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 stat
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 statm
+-r--r--r--    1 dmcbri01 users           0 Mar 29 03:14 status
+[dmcbri01@moe process]$ 
+[dmcbri01@moe process]$ cat /proc/22773/environ 
+USER=dmcbri01LOGNAME=dmcbri01HOME=/home/students/dmcbri01PATH=/usr/local/bin:/bin:/usr/binMAIL=/var/mail/dmcbri01SHELL=/bin/bashSSH_CLIENT=147.144.1.2 49407 22SSH_CONNECTION=147.144.1.2 49407 147.144.23.46 22SSH_TTY=/dev/pts/0TERM=vt100[dmc
+bri01@moe process]$ cat /proc/22773/status
+Name:   bash
+State:  S (sleeping)
+Tgid:   22773
+Pid:    22773
+PPid:   22772
+TracerPid:      0
+Uid:    811     811     811     811
+Gid:    100     100     100     100
+FDSize: 256
+Groups: 100 507 
+VmSize:     4568 kB
+VmLck:         0 kB
+VmRSS:      1664 kB
+VmData:      348 kB
+VmStk:        24 kB
+VmExe:       592 kB
+VmLib:      1472 kB
+SigPnd: 0000000000000000
+SigBlk: 0000000000010000
+SigIgn: 8000000000384004
+SigCgt: 000000004b813efb
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
+[dmcbri01@moe process]$ ls -l /proc/22773/fd
+total 0
+lrwx------    1 dmcbri01 users          64 Mar 29 03:17 0 -> /dev/pts/0
+lrwx------    1 dmcbri01 users          64 Mar 29 03:17 1 -> /dev/pts/0
+lrwx------    1 dmcbri01 users          64 Mar 29 03:17 2 -> /dev/pts/0
+lrwx------    1 dmcbri01 users          64 Mar 29 03:17 255 -> /dev/pts/0
+[dmcbri01@moe process]$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR    SZ WCHAN  TTY          TIME CMD
+0 S   811 22773 22772  0  75   0    -  1142 wait4  pts/0    00:00:00 bash
+0 R   811 23628 22773  0  75   0    -   814 -      pts/0    00:00:00 ps
+[dmcbri01@moe process]$ more  /proc/22773/maps
+08048000-080dc000 r-xp 00000000 03:02 3571716    /bin/bash
+080dc000-080e2000 rw-p 00093000 03:02 3571716    /bin/bash
+080e2000-08132000 rwxp 00000000 00:00 0
+40000000-40015000 r-xp 00000000 03:02 16386      /lib/ld-2.3.2.so
+40015000-40016000 rw-p 00015000 03:02 16386      /lib/ld-2.3.2.so
+40016000-4001c000 r--s 00000000 03:02 966853     /usr/lib/gconv/gconv-modules.ca
+che
+40022000-40025000 r-xp 00000000 03:02 16448      /lib/libtermcap.so.2.0.8
+40025000-40026000 rw-p 00002000 03:02 16448      /lib/libtermcap.so.2.0.8
+40026000-40027000 rw-p 00000000 00:00 0
+40027000-4002a000 r-xp 00000000 03:02 16399      /lib/libdl-2.3.2.so
+4002a000-4002b000 rw-p 00002000 03:02 16399      /lib/libdl-2.3.2.so
+		etc.....
+
+########################################
+man 5 proc
+########################################
+       proc - process information pseudo-filesystem
+
+DESCRIPTION
+       /proc  is  a  pseudo-filesystem which is used as an interface to kernel
+       data structures rather than reading and interpreting  /dev/kmem.   Most
+       of  it  is  read-only,  but  some  files  allow  kernel variables to be
+       changed.
+
+       The following outline gives a quick tour through the /proc hierarchy.
+
+       [number]
+              There is a numerical subdirectory for each running process;  the
+              subdirectory is named by the process ID.  Each contains the fol-
+              lowing pseudo-files and directories.
+
+              cmdline
+                     This holds the complete command  line  for  the  process,
+                     unless  the whole process has been swapped out, or unless
+                     the process is a zombie.  In either of these later cases,
+                     there  is  nothing in this file: i.e. a read on this file
+                     will return 0 characters.   The  command  line  arguments
+                     appear  in  this file as a set of null-separated strings,
+                     with a further null byte after the last string.
+
+              cwd    This is a link to the current working  directory  of  the
+                     process.   To  find  out  the  cwd  of  process  20,  for
+                     instance, you can do this:
+
+                     cd /proc/20/cwd; /bin/pwd
+
+                     Note that the pwd command is often a shell  builtin,  and
+                     might not work properly. In bash, you may use pwd -P.
+
+              environ
+                     This  file contains the environment for the process.  The
+                     entries are separated by null characters, and  there  may
+                     be  a  null character at the end.  Thus, to print out the
+                     environment of process 1, you would do:
+
+                     (cat /proc/1/environ; echo) | tr "\000" "\n"
+
+                     (For a reason  why  one  should  want  to  do  this,  see
+                     lilo(8).)
+
+              exe    Under Linux 2.2 and 2.4 exe is a symbolic link containing
+                     the actual path name of the executed  command.   The  exe
+                     symbolic  link  can be dereferenced normally - attempting
+                     to open exe will open the executable.  You can even  type
+                     /proc/[number]/exe  to  run another copy of the same pro-
+                     cess as [number].
+
+                     Under Linux 2.0 and earlier  exe  is  a  pointer  to  the
+                     binary  which  was  executed,  and  appears as a symbolic
+                     link. A readlink(2) call on the exe  special  file  under
+                     Linux 2.0 returns a string in the format:
+
+                     [device]:inode
+
+                     For  example,  [0301]:1502  would be inode 1502 on device
+                     major 03 (IDE, MFM, etc. drives) minor 01  (first  parti-
+                     tion on the first drive).
+
+                     find(1)  with  the -inum option can be used to locate the
+                     file.
+
+              fd     This is a subdirectory containing one entry for each file
+                     which the process has open, named by its file descriptor,
+                     and which is a symbolic link to the actual file  (as  the
+                     exe  entry  does).  Thus, 0 is standard input, 1 standard
+                     output, 2 standard error, etc.
+
+
+                     Programs that will take a filename, but will not take the
+                     standard  input,  and which write to a file, but will not
+                     send their output to standard output, can be  effectively
+                     foiled this way, assuming that -i is the flag designating
+                     an input file and -o is the flag  designating  an  output
+                     file:
+                     foobar -i /proc/self/fd/0 -o /proc/self/fd/1 ...
+                     and  you  have a working filter.  Note that this will not
+                     work for programs that seek on their files, as the  files
+                     in the fd directory are not seekable.
+
+                     /proc/self/fd/N is approximately the same as /dev/fd/N in
+                     some UNIX and  UNIX-like  systems.   Most  Linux  MAKEDEV
+                     scripts  symbolically  link  /dev/fd to /proc/self/fd, in
+                     fact.
+
+              maps   A file containing the currently mapped memory regions and
+                     their access permissions.
+
+                     The format is:
+
+        address           perms offset  dev   inode      pathname
+        08048000-08056000 r-xp 00000000 03:0c 64593      /usr/sbin/gpm
+        08056000-08058000 rw-p 0000d000 03:0c 64593      /usr/sbin/gpm
+        08058000-0805b000 rwxp 00000000 00:00 0
+        40000000-40013000 r-xp 00000000 03:0c 4165       /lib/ld-2.2.4.so
+        40013000-40015000 rw-p 00012000 03:0c 4165       /lib/ld-2.2.4.so
+        4001f000-40135000 r-xp 00000000 03:0c 45494      /lib/libc-2.2.4.so
+        40135000-4013e000 rw-p 00115000 03:0c 45494      /lib/libc-2.2.4.so
+        4013e000-40142000 rw-p 00000000 00:00 0
+        bffff000-c0000000 rwxp 00000000 00:00 0
+
+                     where address is the address space in the process that it
+                     occupies, perms is a set of permissions:
+
+                          r = read
+                          w = write
+                          x = execute
+                          s = shared
+                          p = private (copy on write)
+
+                     offset is the offset into the file/whatever, dev  is  the
+                     device  (major:minor),  and  inode  is  the inode on that
+                     device.  0 indicates that no inode is associated with the
+                     memory region, as the case would be with bss.
+
+                     Under Linux 2.0 there is no field giving pathname.
+
+              mem    Via  the mem file one can access the pages of a processâs
+                     memory through open(2), read(2), and fseek(3).
+
+              root   Unix and Linux support the idea of a per-process root  of
+                     the  filesystem,  set by the chroot(2) system call.  Root
+                     points to the file system root, and behaves as exe, fd/*,
+                     etc. do.
+
+              stat   Status  information  about  the process.  This is used by
+                     ps(1).  It is defined in  /usr/src/linux/fs/proc/array.c.
+
+                     The  fields,  in order, with their proper scanf(3) format
+                     specifiers, are:
+
+                      pid %d The process id.
+
+                     comm %s
+                             The filename of the executable,  in  parentheses.
+                             This  is visible whether or not the executable is
+                             swapped out.
+
+                     state %c
+                             One character from the string "RSDZTW" where R is
+                             running,  S is sleeping in an interruptible wait,
+                             D is waiting in uninterruptible disk sleep, Z  is
+                             zombie, T is traced or stopped (on a signal), and
+                             W is paging.
+
+                     ppid %d
+                             The PID of the parent.
+
+                     pgrp %d
+                             The process group ID of the process.
+
+                     session %d
+                             The session ID of the process.
+
+                     tty_nr %d
+                             The tty the process uses.
+
+                     tpgid %d
+                             The process group ID of the  process  which  cur-
+                             rently owns the tty that the process is connected
+                             to.
+
+                     flags %lu
+                             The flags of the process.  The math bit is  deci-
+                             mal 4, and the traced bit is decimal 10.
+
+                     minflt %lu
+                             The  number  of minor faults the process has made
+                             which have not required  loading  a  memory  page
+                             from disk.
+
+                     cminflt %lu
+                             The  number  of minor faults that the process and
+                             its children have made.
+
+                     majflt %lu
+                             The number of major faults the process  has  made
+                             which  have  required  loading a memory page from
+                             disk.
+
+                     cmajflt %lu
+                             The number of major faults that the  process  and
+                             its children have made.
+
+                     utime %lu
+                             The  number of jiffies that this process has been
+                             scheduled in user mode.
+
+                     stime %lu
+                             The number of jiffies that this process has  been
+                             scheduled in kernel mode.
+
+                     cutime %ld
+                             The  number  of jiffies that this process and its
+                             children have been scheduled in user mode.
+
+                     cstime %ld
+                            The number of jiffies that this process  and  its
+                             children have been scheduled in kernel mode.
+
+                     priority %ld
+                             The standard nice value, plus fifteen.  The value
+                             is never negative in the kernel.
+
+                     nice %ld
+                             The nice value ranges from  19  (nicest)  to  -19
+                             (not nice to others).
+
+                      0 %ld  This  value  is  hard coded to 0 as a placeholder
+                             for a removed field.
+
+                     itrealvalue %ld
+                             The time in jiffies before the  next  SIGALRM  is
+                             sent to the process due to an interval timer.
+
+                     starttime %lu
+                             The  time  in  jiffies  the process started after
+                             system boot.
+
+                     vsize %lu
+                             Virtual memory size in bytes.
+
+                     rss %ld
+                             Resident Set Size: number of  pages  the  process
+                             has  in  real  memory, minus 3 for administrative
+                             purposes. This is  just  the  pages  which  count
+                             towards  text,  data,  or stack space.  This does
+                             not include pages which  have  not  been  demand-
+                             loaded in, or which are swapped out.
+
+                     rlim %lu
+                             Current  limit in bytes on the rss of the process
+                             (usually 4,294,967,295).
+
+                     startcode %lu
+                             The address above which program text can run.
+
+                     endcode %lu
+                             The address below which program text can run.
+
+                     startstack %lu
+                             The address of the start of the stack.
+
+                     kstkesp %lu
+                             The current value  of  esp  (stack  pointer),  as
+                             found in the kernel stack page for the process.
+
+                     kstkeip %lu
+                             The current EIP (instruction pointer).
+
+                     signal %lu
+                             The bitmap of pending signals (usually 0).
+
+                     blocked %lu
+                            The  bitmap  of blocked signals (usually 0, 2 for
+                             shells).
+
+                     sigignore %lu
+                             The bitmap of ignored signals.
+
+                     sigcatch %lu
+                             The bitmap of catched signals.
+
+                     wchan %lu
+                             This is the "channel" in  which  the  process  is
+                             waiting.  It is the address of a system call, and
+                             can be looked up in a namelist if you need a tex-
+                             tual   name.    (If   you   have   an  up-to-date
+                             /etc/psdatabase, then try ps -l to see the  WCHAN
+                             field in action.)
+
+                     nswap %lu
+                             Number of pages swapped - not maintained.
+
+                     cnswap %lu
+                             Cumulative nswap for child processes.
+
+                     exit_signal %d
+                             Signal to be sent to parent when we die.
+
+                     processor %d
+                             Processor number last executed on.
+
+              statm  Provides  information  about memory status in pages.  The
+                     columns are:
+                      size       total program size
+                      resident   resident set size
+                      share      shared pages
+                      trs        text (code)
+                      drs        data/stack
+                      lrs        library
+                      dt         dirty pages
+
+              status Provides much of the information in stat and statm in  an
+                     format thatâs easier for humans to parse.
+
+       bus    Contains subdirectories for installed busses.
+
+              pci    Contains various bus subdirectories and pseudo-files con-
+                     taining information about pci busses, installed  devices,
+                     and device drivers.  Some of these files are not ASCII.
+
+                     devices
+                             Information  about  pci  devices.   They  may  be
+                             accessed through lspci(8) and setpci(8).
+
+       cmdline
+              Argments passed to the Linux kernel at boot  time.   Often  done
+
+	  cpuinfo
+              This  is  a  collection of CPU and system architecture dependent
+              items, for each supported architecture a  different  list.   Two
+              common   entries  are  processor  which  gives  CPU  number  and
+              bogomips; a system constant that  is  calculated  during  kernel
+              initialization.  SMP machines have information for each CPU.
+
+       devices
+              Text  listing  of  major numbers and device groups.  This can be
+              used by MAKEDEV scripts for consistency with the kernel.
+
+       dma    This is a list of the registered ISA DMA (direct memory  access)
+              channels in use.
+
+       driver Empty subdirectory.
+
+       execdomains
+              List of the execution domains (ABI personalities).
+
+       fb     Frame buffer information when CONFIG_FB is defined during kernel
+              compilation.
+
+       filesystems
+              A text listing of the filesystems which were compiled  into  the
+              kernel.  Incidentally, this is used by mount(1) to cycle through
+              different filesystems when none is specified.
+
+       ide    ide exists on systems with the ide bus.  There  are  directories
+              for each ide channel and attached device.  Files include:
+
+              cache              buffer size in KB
+              capacity           number of sectors
+              driver             driver version
+              geometry           physical and logical geometry
+              identify           in hexidecimal
+              media              media type
+              model              manufacturerâs model number
+              settings           drive settings
+              smart_thresholds   in hexidecimal
+              smart_values       in hexidecimal
+
+              The  hdparm(8)  utility provides access to this information in a
+              friendly format.
+
+       interrupts
+              This is used to record the number of interrupts per each IRQ  on
+              (at least) the i386 architechure.  Very easy to read formatting,
+              done in ASCII.
+
+       iomem  I/O memory map in Linux 2.4.
+
+       ioports
+              This is a list of currently registered Input-Output port regions
+              that are in use.
+
+       kcore  This  file  represents  the physical memory of the system and is
+              stored in the ELF core file format.  With this pseudo-file,  and
+              an unstripped kernel (/usr/src/linux/vmlinux) binary, GDB can be
+skipped some
+
+       stat   kernel/system statistics.   Varies  with  architecture.   Common
+              entries include:
+
+              cpu  3357 0 4313 1362393
+                     The  number  of  jiffies  (1/100ths of a second) that the
+                     system spent in user mode, user mode  with  low  priority
+                     (nice),  system  mode,  and  the idle task, respectively.
+                     The last value should be 100 times the  second  entry  in
+                     the uptime pseudo-file.
+
+              page 5741 1808
+                     The  number  of  pages the system paged in and the number
+                     that were paged out (from disk).
+
+              swap 1 0
+                     The number of swap pages that have been  brought  in  and
+                     out.
+
+              intr 1462898
+                     The number of interrupts received from the system boot.
+
+              disk_io: (2,0):(31,30,5764,1,2) (3,0):...
+                     (major,minor):(noinfo,       read_io_ops,      blks_read,
+                     write_io_ops, blks_written)
+
+              ctxt 115315
+                     The number of context switches that the system underwent.
+
+              btime 769041601
+                    boot  time, in seconds since the epoch (January 1, 1970).
+
+              processes 86031
+                     Number of forks since boot.
+
+       swaps  Swap areas in use.  See also swapon(8).
+
+       sys    This directory (present since 1.3.57) contains a number of files
+              and  subdirectories  corresponding  to  kernel variables.  These
+              variables can be read and sometimes modified using the proc file
+              system, and the sysctl(2) system call. Presently, there are sub-
+              directories abi, debug, dev, fs, kernel, net, proc,  sunrpc  and
+              vm that each contain more files and subdirectories.
+
+              abi    This  directory may be empty.  On some systems, it is not
+                     present.
+
+              debug  This directory may be empty.
+
+              dev    This directory contains device specific  information  (eg
+                     dev/cdrom/info).  On some systems, it may be empty.
+
+              fs     This contains the subdirectory binfmt_misc and files den-
+                     try-state, dir-notify-enable, dquot-nr,  file-max,  file-
+                     nr,  inode-max,  inode-nr, inode-state, lease-break-time,
+                     leases-enable,  overflowgid,  overflowuid  super-max  and
+                     super-nr with function fairly clear from the name.
+
+              Documentation  for  the files in /proc/sys/binfmt_misc is in the
+skipped more

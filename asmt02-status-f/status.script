@@ -1,0 +1,85 @@
+Script started on Mon 01 Mar 2004 09:48:37 AM PST
+[dmcbri01@moe cs260]$ Devon McBride
+bash: Devon: command not found
+[dmcbri01@moe cs260]$ cs260
+bash: cs260: command not found
+[dmcbri01@moe cs260]$ status -f maillist
+ -----------------------------------------------------------------------
+                     Information about the file 'maillist' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rwxr--r-- (744)
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+                  File's size in bytes: 2815
+              File's size in 1k blocks: 4
+[dmcbri01@moe cs260]$ status -f food
+status: error: food isnt a valid file.  It doesnt seem to exist.
+[dmcbri01@moe cs260]$ status -f fooDir1
+ -----------------------------------------------------------------------
+                     Information about the directory 'fooDir1' 
+ -----------------------------------------------------------------------
+                              filetype: directory
+                           permissions: rwxr-xr-x (755)
+              Number of subdirectories: 1
+                    Owner of directory: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+         Directory's size in 1k blocks: 4
+[dmcbri01@moe cs260]$ status -f temporarySL
+ -----------------------------------------------------------------------
+                     Information about the file 'temporarySL' 
+ -----------------------------------------------------------------------
+                              filetype: symbolic link
+                           permissions: rwxrwxrwx (777)
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+[dmcbri01@moe cs260]$ status -f /dev/zero
+ -----------------------------------------------------------------------
+                     Information about the file '/dev/zero' 
+ -----------------------------------------------------------------------
+                              filetype: character special file
+                           permissions: rw-rw-rw- (666)
+                  Number of references: 1
+                         Owner of file: root (uid=0)
+                      File is in group: root (gid=0)
+                   Major device number: 1,
+                   Minor device number: 5
+[dmcbri01@moe cs260]$ cd fooDir1
+[dmcbri01@moe fooDir1]$ ls
+fooDir2  status  temporaryfile
+[dmcbri01@moe fooDir1]$ status -f
+ -----------------------------------------------------------------------
+                     Information about the directory 'fooDir2' 
+ -----------------------------------------------------------------------
+                              filetype: directory
+                           permissions: rwxr-xr-x (755)
+              Number of subdirectories: 0
+                    Owner of directory: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+         Directory's size in 1k blocks: 4
+ -----------------------------------------------------------------------
+                     Information about the file 'status' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rwxr-xr-x (755)
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+                  File's size in bytes: 10705
+              File's size in 1k blocks: 12
+ -----------------------------------------------------------------------
+                     Information about the file 'temporaryfile' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rw-r--r-- (644)
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=811)
+                      File is in group: users (gid=100)
+                  File's size in bytes: 0
+              File's size in 1k blocks: 0
+[dmcbri01@moe fooDir1]$ exit
+exit
+
+Script done on Mon 01 Mar 2004 09:51:27 AM PST

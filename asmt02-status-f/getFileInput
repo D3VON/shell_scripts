@@ -1,0 +1,4 @@
+#!/bin/bash
+# a command can receive data from a file.
+# This example prints what's in tempo to the screen.
+cat < tempo

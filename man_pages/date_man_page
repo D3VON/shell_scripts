@@ -1,0 +1,446 @@
+ date(1)							     date(1)
+
+ NAME
+      date - display or set the date and time
+
+ SYNOPSIS
+      date [-u]
+
+      date [-u] +format
+
+      date [-u] [mmddhhmm[[cc]yy]]
+
+      date [-a [-]sss[.fff]]
+
+ DESCRIPTION
+      The date command displays or sets the current HP-UX system clock date
+      and time.	 Since the HP-UX system operates in Coordinated Universal
+      Time (UTC), date automatically converts to and from local standard or
+      daylight/summer time, based on your TZ environment variable.  See
+      Environment Variables in EXTERNAL INFLUENCES below.
+
+    Options
+      date recognizes the following option:
+
+	   -u	Input and output values in Coordinated Universal Time (UTC),
+		functionally equivalent to Greenwich Mean Time (GMT),
+		instead of in local time.
+
+	   -a [-]sss[.fff]
+		Slowly adjust the time by sss.fff seconds (fff represents
+		fractions of a second).	 This adjustment can be positive or
+		negative.  The system's clock will be sped up or slowed down
+		until it has drifted by the number of seconds specified.
+
+    Formats
+      The date command has two forms for displaying the date and time and
+      one form for setting them.
+
+	   date [-u]
+
+		   Display the current date and time.  The output is the
+		   same as for the %c formatting directive for all languages
+		   except the C default language.  See Formatting Directives
+		   and EXAMPLES below.
+
+	   date [-u] +format
+
+		   Display the current date and time according to formatting
+		   directives specified in format, which is a string of zero
+		   or more formatting directives and ordinary characters.
+		   If it contains blanks, enclose it in apostrophes or
+		   quotation marks.
+
+		   See Formatting Directives below.
+
+		   All ordinary characters are copied unchanged into the
+		   output string.
+
+		   The output string is always terminated with a newline
+		   character.
+
+		   If + is specified and format is omitted, only a newline
+		   is output.
+
+	   date [-u] [mmddhhmm[[cc]yy]]
+
+		   Set the HP-UX system clock to the date and time
+		   specified.  You require the superuser privilege.
+
+		   If you include the -u option, the specified date and time
+		   is assumed to be in Coordinated Universal Time (UTC).
+
+		   The numeric argument is interpreted left to right in
+		   two-digit pairs as follows:
+
+			mm   Month number [01-12].
+			dd   Day number in the month [01-31].
+			hh   Hour number (24-hour system) [00-23].
+			mm   Minute number [00-59].
+			cc   Century minus one [19-20].
+			yy   Last two digits of the year number [70-99, 00-
+			     37 (1970-1999, 2000-2037)].  If omitted, the
+			     current year is used.
+
+		   If you attempt to set the date backwards, date generates
+		   the warning,
+
+			do you really want to run time backwards?[yes/no]
+
+		   Type yes or the equivalent for your locale to set the
+		   clock backwards; anything else to cancel the command.
+
+		   When date is used to set the date, a pair of date change
+		   records is written to the file /var/adm/wtmp.
+
+		   (XPG4 only.) No warning is generated if date is set
+		   backwards.
+
+    Formatting Directives
+      The following formatting directives, shown without the optional field
+      width and precision specification, are replaced by the indicated
+      characters.  If a directive is not one of the following, the result is
+      undefined.
+
+      The output for digits, characters, and words depends on the
+      language/locale settings.	 See Environment Variables in EXTERNAL
+      INFLUENCES below.
+
+      The examples assume that the date command was executed on Wednesday,
+      January 12, 1994 at 7:45:58 p.m. Pacific Standard Time, using the C
+      default language.
+
+	   %a	Abbreviated weekday name.  For example, Wed.
+
+	   %A	Full weekday name.  For example, Wednesday.
+
+	   %b	Abbreviated month name.	 For example, Jan.
+
+	   %B	Full month name.  For example, January.
+
+	   %c	Current date and time representation.  For example, Wed Jan
+		12 19:45:58 1994.
+
+	   %C	Century (the year divided by 100 and truncated to an
+		integer) as a two-digit decimal number [00-99].	 For
+		example, 19.
+
+	   %d	Day of the month as a two-digit decimal number [01-31].	 For
+		example, 12.
+
+	   %e	Day of the month as a two-character decimal number with
+		leading space fill [" 1"-"31" ].  For example, 12.
+
+	   %E	Combined Emperor/Era name and year.
+
+	   %H	Hour (24-hour clock) as a two-digit decimal number [00-23].
+		For example, 19.
+
+	   %I	Hour (12-hour clock) as a two-digit decimal number [01-12].
+		For example, 07.
+
+	   %j	Day of the year as a three-digit decimal number [001-366].
+		For example, 012.
+
+	   %m	Month as a decimal two-digit number [01-12].  For example,
+		01.
+
+	   %M	Minute as a decimal two-digit number [00-59].  For example,
+		45.
+
+	   %n	Newline character.
+
+	   %N	Emperor/Era name.
+
+	   %o	Emperor/Era year.
+
+	   %p	Equivalent of either AM or PM.	For example, PM.
+
+	   %R	Time as %H:%M
+
+	   %S	Second as a two-digit decimal number (allows for possible
+		leap seconds) [00-61].	For example, 58.
+
+	   %t	Tab character.
+
+	   %u	Weekday as a one-digit decimal number [1-7 (Monday-Sunday)].
+		For example, 3.
+
+	   %U	Week number of the year (Sunday as the first day of the
+		week) as a two-digit decimal number [00-53].  All days that
+		precede the first Sunday in the year are considered to be in
+		week 00.  For example, 02.
+
+	   %V	Week number of the year (Monday as the first day of the
+		week) as a two-digit decimal number [01-53].  If the week
+		containing January 1 has four or more days in the new year
+		(January 1 is Thursday or sooner), it is designated as week
+		01; otherwise, (January 1 is Friday or later), it is
+		designated as the last week of the previous year, and the
+		next week is week 01.  For example, 02.
+
+	   %w	Weekday as a one-digit decimal number [0-6 (Sunday-
+		Saturday)].  For example, 3.
+
+	   %W	Week number of the year (Monday as the first day of the
+		week) as a two-digit decimal number [00-53].  All days that
+		precede the first Monday in the year are considered to be in
+		week 00.  For example, 02.
+
+	   %x	Current date representation.  For example, 01/12/94.
+
+	   %X	Current time representation.  For example, 19:45:58.
+
+	   %y	Year without century as a two-digit decimal number [00-99].
+		For example, 93.
+
+	   %Y	Year with century as a four-digit decimal number [1970-
+		2037].	For example, 1994.
+
+	   %Z	Time zone name (or no characters if time zone cannot be
+		determined).  For example, PST.
+
+	   %%	The % character.
+
+    Obsolescent Directives
+      The following directives are provided for backward compatibility.	 It
+      is recommended that the preceding directives be used instead.
+
+	   %D	Date in usual U.S. format.  For example, 01/12/94.  Use %x
+		or %m/%d/%y instead.
+
+	   %F	Full month name.  For example, January.	 Use %B instead.
+
+	   %h	Abbreviated month name.	 For example, Jan.  Use %b instead.
+
+	   %r	Time in 12-hour U.S. format.  For example, 07:45:58 PM.	 Use
+		"%I:%M:%S %p" instead.
+
+	   %T	Time in 24-hour U.S. format.  For example, 19:45:58.  Use %X
+		or %H:%M:%S instead.
+
+	   %z	Time zone name (or no characters if time zone cannot be
+		determined).  For example, PST.	 Use %Z instead.
+
+    Modified Formatting Directives
+      Some Formatting Directives can be modified by the E and O modifier
+      characters to indicate a different format or specification for the
+      language specified in the LC_TIME environment variable.
+
+      If the corresponding keyword (era, era_year, era_d_fmt, and alt_digit)
+      is not specified or not supported, the unmodified field descriptor
+      value is used.  The command
+
+	   LC_ALL=language locale -ck era era_year era_d_fmt alt_digit
+
+      displays the keywords and their values in the specified language (see
+      locale(1)).
+
+	   %Ec	     Alternate appropriate date and time representation.
+
+	   %EC	     The name of the base year in alternate representation.
+
+	   %Ex	     Alternate date representation.
+
+	   %Ey	     Offset from %EC (year only) in the alternate
+		     representation.
+
+	   %EY	     Full alternate year representation.
+
+	   %Od	     Day of month using the alternate numeric symbols.
+
+	   %Oe	     Day of month using the alternate numeric symbols with
+		     leading space-character fill if applicable.
+
+	   %OH	     Hour (24-hour clock) using the alternate numeric
+		     symbols.
+
+	   %OI	     Hour (12-hour clock) using the alternate numeric
+		     symbols.
+
+	   %Om	     Month using the alternate numeric symbols.
+
+	   %OM	     Minutes using the alternate numeric symbols.
+
+	   %OS	     Seconds using the alternate numeric symbols.
+
+	   %OU	     Week number of the year (Sunday is the first day of the
+		     week) using the alternate numeric symbols.
+
+	   %Ow	     Weekday as number using the alternate numeric symbols
+		     (Sunday=0).
+
+	   %OW	     Weekday number of the year (Monday is the first day of
+		     the week) using the alternate numeric symbols.
+
+	   %Oy	     Year (offset from %C) in alternate representation.
+
+    Field Width and Precision
+      An optional field width and precision specification can immediately
+      follow the initial % of a formatting directive in the following order:
+
+	   [-|0]width  The decimal digit string width specifies a minimum
+		       field width in which the result of the conversion is
+		       right- or left-justified.  The default is right-
+		       justified with space padding on the left.  If the
+		       string starts with "-", the result is left-justified
+		       with space padding on the right.	 If the string
+		       starts with "0", the result is right-justified and
+		       padded with zeros on the left.
+
+	   .prec       The decimal digit string prec specifies the minimum
+		       number of digits to appear for the d, H, I, j, m, M,
+		       o, S, U, w, W, y, and Y numeric directives.  If a
+		       directive supplies fewer digits than specified by the
+		       precision, it will be expanded with leading zeros.
+
+		       prec specifies the maximum number of characters to be
+		       used from the a, A, b, B, c, D, E, F, h, n, N, p, r,
+		       t, T, x, X, z, Z, and % text directives.	 If a
+		       directive supplies more characters than specified by
+		       the precision, excess characters are truncated on the
+		       right.
+
+      If no field width or precision is specified for a d, H, I, m, M, S, U,
+      W, or y directive, the default is .2; for the j directive, the default
+      is .3; for Y, the default is .4; for w, the default is .1.
+
+ EXTERNAL INFLUENCES
+    Environment Variables
+      LC_CTYPE determines the interpretation of the bytes within the format
+      string as single- and/or multi-byte characters.
+
+      LC_NUMERIC determines the characters used to form numbers for those
+      directives that produce numbers in the output.  The characters used
+      are those defined by alt_digit (see locale(1) and ALT_DIGIT in
+      langinfo(5)).
+
+      LC_TIME determines the content (for example, the weekday names
+      produced by the %a directive) and format (for example, the current
+      time representation produced by the %X directive) of date and time
+      strings output by the date command.
+
+      LC_MESSAGES determines the language in which messages (other than the
+      date and time strings) are displayed.
+
+      If LC_CTYPE, LC_NUMERIC, LC_TIME, or LC_MESSAGES is not specified or
+      is null, it defaults to the value of LANG.
+
+      If LANG is not specified or is null, it defaults to C (see lang(5)).
+
+      If any internationalization variable contains an invalid setting, all
+      internationalization variables default to C (see environ(5)).
+
+      TZ determines the conversion between the system time in UTC and the
+      time in the user's local time zone.  See environ(5) and tztab(4).	 TZ
+      also determines the content (that is, the time-zone name produced by
+      the %z and %Z directives) of date and time strings output by the date
+      command.
+
+      If TZ is not set or is set to the empty string, its default value is
+      EST5EDT.
+
+    International Code Set Support
+      Single- and multi-byte character code sets are supported.
+
+ DIAGNOSTICS
+      The following messages may be displayed.
+
+      bad conversion
+
+	      The date/time specification is syntactically incorrect.  Check
+	      it against the usage and for the correct range of each of the
+	      digit-pairs.
+
+      bad format character - c
+
+		  The character c is not a valid format directive, field width
+	      specifier, or precision specifier.
+
+      do you really want to run time backwards?[yes/no]
+
+	      The date/time you specified is earlier than the current clock
+	      value.  Type yes (or the equivalent for your locale) to set
+	      the clock backwards; anything else to cancel the command.
+
+      no permission
+
+	      You need the superuser privilege to change the date.
+
+ EXAMPLES
+    Date in Different Languages
+      Display the date.	 In this example, the TZ environment variable
+      contains PST8PDT, and the language environment variables are set as
+      noted.
+
+      date    -> Fri Aug 20 15:03:37 PDT 1993  <- C (default)
+      date -u -> Fri Aug 20 22:03:37 UTC 1993  <- C (default)
+      date    -> Fri, Aug 20, 1993 03:03:37 PM <- en_US.roman8 (U.S. English)
+      date    -> Fri. 20 Aug, 1993 03:03:37 PM <- en_GB.roman8 (U.K. English)
+      date    -> 20/08/1993 15.47.47	       <- pt_PT.roman8 (Portuguese)
+
+    Set Date
+      Set the date to Oct 8, 12:45 a.m.
+
+	   date 10080045
+
+    Display Formatted Date
+      Display the current date and time using a format.	 Note the use of
+      quotation marks due to the blanks in the format.
+
+	   date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
+
+      The output resembles the following:
+
+	   DATE: 10/08/87
+	   TIME: 12:45:05
+
+    Display Formatted Date Using Local Language Conversion
+      With the date as set in the "Set Date" example above and LC_TIME set
+      to de_De.roman8 (German):
+
+	   date +'%-4.4h %2.1d %H:%M'
+
+      generates output similar to:
+
+	   Okt	 8 12:45
+
+      where the month field is four characters long, flush-left, and space-
+      padded on the right if the month name is shorter than four characters.
+      The day field is two characters long, with leading zeros suppressed.
+
+ WARNINGS
+      The former HP-UX format directive A has been changed to W for ANSI
+      compatibility.
+
+      Changing the date while the system is running in multiuser mode should
+      be avoided to prevent disrupting user-scheduled and time sensitive
+      programs and processes.  Also, changing the date can cause make(1) and
+      the SCCS and cron(1M) subsystems to behave in an unexpected manner.
+      The cron daemon should be killed prior to setting the date backwards,
+      then restarted.  SCCS files should be checked with the val command
+      (see val(1)) if deltas have been made while the clock was wrongly set.
+
+      The following formatting directives may be deleted from future
+      releases: %E, %F, %o, %z.
+
+      Currently, the maximum date supported is December 31, 2037 23:59:00
+      UTC.
+
+ AUTHOR
+      date was developed by AT&T and HP.
+
+ FILES
+      /var/adm/wtmp
+
+ SEE ALSO
+      locale(1), stime(2), ctime(3C), strftime(3C), tztab(4), environ(5),
+      lang(5), langinfo(5).
+
+ STANDARDS CONFORMANCE
+      date: SVID2, SVID3, XPG2, XPG3, XPG4, POSIX.2
+
+ Hewlett-Packard Company	    - 9 -    HP-UX Release 11.00: March 1999
+
+
+

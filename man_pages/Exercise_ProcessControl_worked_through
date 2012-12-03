@@ -1,0 +1,135 @@
+
+[dmcbri01@moe process]$ fivemin &
+[1] 22825
+[dmcbri01@moe process]$ kill -HUP 22825
+[dmcbri01@moe process]$ fivemin: EXITING ######then I hit enter
+
+[1]+  Hangup                  fivemin
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 22833 22773  0 02:12 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$
+
+[dmcbri01@moe process]$ fivemin &
+[1] 22834
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 22834 22773  0 02:13 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 22837 22834  0 02:13 pts/0    00:00:00 sleep 4
+dmcbri01 22838 22773  0 02:13 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill 22834
+[dmcbri01@moe process]$ fivemin: EXITING ######then I hit enter
+
+[1]+  Terminated              fivemin
+[dmcbri01@moe process]$ 
+
+[dmcbri01@moe process]$ fivemin &
+[1] 22843							###I inadvertantly ran two,
+[dmcbri01@moe process]$ fivemin &   ### but that was actually good
+[2] 22845
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 22843 22773  0 02:14 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 22845 22773  0 02:14 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 22846 22845  0 02:14 pts/0    00:00:00 sleep 4
+dmcbri01 22847 22843  0 02:14 pts/0    00:00:00 sleep 4
+dmcbri01 22848 22773  0 02:14 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill -QUIT 22843 ####didn't produce message to screen
+[dmcbri01@moe process]$ kill -SEGV 22845 #### did produce message
+[dmcbri01@moe process]$ fivemin: EXITING ###here I pressed enter
+											####neither of these 
+[2]+  Segmentation fault      fivemin		####produced any core dump
+[dmcbri01@moe process]$					# Also, -QUIT didn't stop the process
+
+
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 22989 22773  0 02:21 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 22991 22773  0 02:21 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 22993 22773  0 02:21 pts/0    00:00:00 /bin/bash ./fivemin
+dmcbri01 23037 22989  0 02:22 pts/0    00:00:00 sleep 4
+dmcbri01 23038 22991  0 02:22 pts/0    00:00:00 sleep 4
+dmcbri01 23039 22993  0 02:22 pts/0    00:00:00 sleep 4
+dmcbri01 23040 22773  0 02:22 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill -TERM 22989
+[dmcbri01@moe process]$ fivemin: EXITING   #had to press enter to proceed
+
+[3]   Terminated              fivemin
+[dmcbri01@moe process]$ kill -HUP 22991    #didn't have to press enter!
+fivemin: EXITING
+[4]-  Hangup                  fivemin
+[dmcbri01@moe process]$ 
+
+#########################################################
+from the <<man 7 signal>> page: list of available signals
+#########################################################
+       The  entries  in  the  "Action" column of the table specify the default
+       action for the signal, as follows:
+
+       Term   Default action is to terminate the process.
+
+       Ign    Default action is to ignore the signal.
+
+       Core   Default action is to terminate the process and dump core.
+
+       Stop   Default action is to stop the process.
+
+       First the signals described in the original POSIX.1 standard.
+
+       Signal     Value     Action   Comment
+       -------------------------------------------------------------------------
+       SIGHUP        1       Term    Hangup detected on controlling terminal
+                                     or death of controlling process
+       SIGINT        2       Term    Interrupt from keyboard
+       SIGQUIT       3       Core    Quit from keyboard
+       SIGILL        4       Core    Illegal Instruction
+       SIGABRT       6       Core    Abort signal from abort(3)
+       SIGFPE        8       Core    Floating point exception
+       SIGKILL       9       Term    Kill signal
+       SIGSEGV      11       Core    Invalid memory reference
+       SIGPIPE      13       Term    Broken pipe: write to pipe with no readers
+       SIGALRM      14       Term    Timer signal from alarm(2)
+       SIGTERM      15       Term    Termination signal
+       SIGUSR1   30,10,16    Term    User-defined signal 1
+       SIGUSR2   31,12,17    Term    User-defined signal 2
+       SIGCHLD   20,17,18    Ign     Child stopped or terminated
+       SIGCONT   19,18,25            Continue if stopped
+       SIGSTOP   17,19,23    Stop    Stop process
+       SIGTSTP   18,20,24    Stop    Stop typed at tty
+       SIGTTIN   21,21,26    Stop    tty input for background process
+       SIGTTOU   22,22,27    Stop    tty output for background process
+
+       The signals SIGKILL and SIGSTOP cannot be caught, blocked, or  ignored.
+[dmcbri01@moe process]$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR    SZ WCHAN  TTY          TIME CMD
+0 S   811 22773 22772  0  76   0    -  1112 wait4  pts/0    00:00:00 bash
+0 S   811 23244 22773  0  75   0    -  1033 wait4  pts/0    00:00:00 catchall
+0 S   811 23248 22773  0  77   0    -  1033 wait4  pts/0    00:00:00 catchall
+0 S   811 23252 23248  0  77   0    -   920 schedu pts/0    00:00:00 sleep
+0 S   811 23253 23244  0  75   0    -   919 schedu pts/0    00:00:00 sleep
+0 R   811 23254 22773  0  81   0    -   814 -      pts/0    00:00:00 ps
+[dmcbri01@moe process]$ kill -KILL 23244 # -KILL *really* kills catchall!!
+[dmcbri01@moe process]$ ps -l			 # others don't, but they're just caught
+F S   UID   PID  PPID  C PRI  NI ADDR    SZ WCHAN  TTY          TIME CMD
+0 S   811 22773 22772  0  75   0    -  1112 wait4  pts/0    00:00:00 bash
+0 S   811 23248 22773  0  75   0    -  1033 wait4  pts/0    00:00:00 catchall
+0 S   811 23269 23248  0  75   0    -   919 schedu pts/0    00:00:00 sleep
+0 R   811 23270 22773  0  75   0    -   813 -      pts/0    00:00:00 ps
+[1]-  Killed                  catchall
+[dmcbri01@moe process]$ kill -QUIT 23244
+-bash: kill: (23244) - No such process
+[dmcbri01@moe process]$ kill -QUIT 23248
+[dmcbri01@moe process]$ catchall: received signal QUIT
+
+[dmcbri01@moe process]$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR    SZ WCHAN  TTY          TIME CMD
+0 S   811 22773 22772  0  75   0    -  1112 wait4  pts/0    00:00:00 bash
+0 S   811 23248 22773  0  75   0    -  1033 wait4  pts/0    00:00:00 catchall
+0 S   811 23283 23248  0  75   0    -   920 schedu pts/0    00:00:00 sleep
+0 R   811 23284 22773  0  75   0    -   813 -      pts/0    00:00:00 ps
+
+

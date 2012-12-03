@@ -1,0 +1,50 @@
+Script started on Wed Jan  9 16:21:25 2002
+$ # Assignment One Greg Boyd
+$ id
+uid=3496(gboyd) gid=208(cisdept) groups=217(labstaff),3040(c32459),3065(c33412),3124(c34612),3158(c35195),3159(c35196),7051(c70779),7133(c74173),7134(c74174),7138(c74178),7193(c74842)
+$ date
+Wed Jan  9 16:21:36 PST 2002
+$ hostname
+hills
+$ ps
+   PID TTY       TIME COMMAND
+ 18507 ttyp3     0:00 ksh
+ 18524 ttyp3     0:00 ps
+$ 
+$ 
+$ maillist 70779
+There are 16 students in CRN#70779
+Its group name is c70779 and the group id is 7051
+
+The members of the class are:
+acho01
+afedor02
+blovel01
+bstepa01
+bstepa02
+cchiu09
+cwong48
+dchau02
+gboyd
+gvinso01
+hhuynh07
+jarrie01
+jlee74
+kcheng05
+lveynb01
+rchavi01
+vkushn01
+
+A copy of this mailing list may be found in
+/users/gboyd/cis169/asmt01/70779
+$ 
+$ 
+$ maillist -q 70779
+$ echo $?
+0
+$ ls
+70779          asmt01.script  maillist
+$ 
+$ exit
+
+script done on Wed Jan  9 16:22:28 2002

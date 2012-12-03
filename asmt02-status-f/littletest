@@ -1,0 +1,10 @@
+#!/bin/bash
+
+list=$@
+
+echo $list
+
+for item in $list
+do
+	echo $item
+done

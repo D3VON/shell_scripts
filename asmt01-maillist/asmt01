@@ -1,0 +1,49 @@
+#! /bin/bash
+#  Program Name: maillist
+#        Author: Devon McBride
+#         Class: cs260 - Unix System Administration
+#                MW 5:30 - 7:00
+# Last Modified: 02/04/2004 
+#
+# This program produces an email list from the group file.  It produces
+# that email list for a crn, given as an arugement.  
+#
+		# this program expects args: optional '-q' for quiet mode and
+		# a CRN number (for the program to locate the class in 
+		# /etc/group.  If '-q' isn't the first arg, then the program 
+		# will accept only one arg, which is the CRN.  This error 
+		# message handles the even that the args were entered wrong.
+
+# handle args
+if [ $# -eq 0 -o $# -gt 2 ]; then
+   #typeset progname=$(basename $0)
+   #echo "$progname: ERROR: $* >&2
+   echo "$0: ERROR: $* >&2
+   echo "progname: usage: $progname [-q] crn-number" >&2
+   exit 1
+fi
+
+
+if [ "$1" =  "-q" ]; then
+	keep track of quiet mode
+	shift
+fi
+CRN = $1
+
+	document this section, syntax of program with this part (in beginning of prog)
+					doc quiet mode, too
+
+line = `grep "^[bc]$CRN:" /etc/group`
+		document distinct
+
+echo $line | cut -d: -f4 | tr ',' '\n' | sed __________ | sort > $CRN
+					give abs path to where it is
+
+if [! quiet (flag)], then
+	cat file
+	get grou0p name and group ID from line, and pring message for user
+	count students
+	report file location
+	warning: in quiet mode, don't print error at all
+
+grep '36512' /etc/group

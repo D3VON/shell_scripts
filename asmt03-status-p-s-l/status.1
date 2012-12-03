@@ -1,0 +1,37 @@
+.TH "status" 1
+.SH STATUS
+status \- a shell program to gives details about objects and processes
+.SH SYNOPSIS
+.B status
+status MODE [file] [file] [file] etc...
+
+where MODE is -p, -s, -f with a file or list, or
+              -l with time
+.SH DESCRIPTION
+This program is designed to assist anyone who wants to get system
+information about objects (files, directories, devices, and so on)
+as well as processes.
+
+This program will run on HP-UX and Linux (9)
+
+The *file* option is available on both platforms.
+    -but it cannot handle files with embedded spaces.
+
+The *process* option is only availabe on Linux.
+
+.SH EXAMPLES
+.TP
+.B \-status -p [with no other arguements]
+This will return info all processes the user is currently running.
+.TP
+.B \-status -f [with no other arguements]
+This will return info on all files in the user's current directory.
+
+.SH "SEE ALSO"
+do an ls on /proc directory; ps; ls; 
+.SH BUGS
+This program cannot yet deal with the paths of processes that the user
+does not have permissions for.  In that case, the program will indicate
+that the path is unknown.  
+Also, the program returns processes (option -p) related to the program
+itself, which isn't very useful.

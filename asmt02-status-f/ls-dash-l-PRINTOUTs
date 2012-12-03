@@ -1,0 +1,26 @@
+
+HP-UX:
+
+$ ls -l
+total 24
+-rwx------   1 dmcbri01   b20025        1192 Feb 27 03:33 checkArgs
+-rwxr-xr-x   1 dmcbri01   b20025         106 Feb 29 04:20 do_ls_command
+-rwxr--r--   1 dmcbri01   b20025         119 Feb 26 02:50 getInputFromFile
+-rwxr--r--   1 dmcbri01   b20025         163 Feb 26 02:43 getOSName
+-rwx------   1 dmcbri01   b20025        1206 Feb 28 20:30 handleArgs
+-rw-------   1 dmcbri01   b20025         425 Feb 29 01:18 tempo
+----------   1 dmcbri01   b20025           0 Feb 29 05:21 testfile
+
+POZOR: this last case will screw up your 'file type' finder b/c there's no 'r' at the beginning
+
+
+
+Linux:
+
+$ ls -l
+total 16
+-rwx------    1 dmcbri01   users        1192 Feb 27 04:13 checkArgs
+-rwx------    1 dmcbri01   users        1207 Feb 27 23:42 handleArgs
+-rwxr--r--    1 dmcbri01   users        2815 Feb 11 19:59 maillist
+-rw-r--r--    1 dmcbri01   users        1456 Feb 11 20:30 status.skel
+

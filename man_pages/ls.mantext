@@ -1,0 +1,462 @@
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+ NAME
+      ls, lc, l, ll, lsf, lsr, lsx - list contents of directories
+
+ SYNOPSIS
+      ls [-abcdefgilmnopqrstuxACFLR1] [names]
+
+      lc [-abcdefgilmnopqrstuxACFLR1] [names]
+
+      l [ls_options] [names]
+      ll [ls_options] [names]
+      lsf [ls_options] [names]
+      lsr [ls_options] [names]
+      lsx [ls_options] [names]
+
+ DESCRIPTION
+      For each directory argument, the ls command lists the contents of the
+      directory.  For each file argument, ls repeats its name and any other
+      information requested.  The output is sorted in ascending collation
+      order by default (see Environment Variables below).  When no argument
+      is given, the current directory is listed.  When several arguments are
+      given, the arguments are first sorted appropriately, but file
+      arguments appear before directories and their contents.
+
+      If you are a user with appropriate privileges, all files except . and
+      .. are listed by default.
+
+      There are three major listing formats.  The format chosen depends on
+      whether the output is going to a login device (determined by whether
+      output device file is a tty device), and can also be controlled by
+      option flags.  The default format for a login device is to list the
+      contents of directories in multicolumn format, with entries sorted
+      vertically by column.  (When individual file names (as opposed to
+      directory names) appear in the argument list, those file names are
+      always sorted across the page rather than down the page in columns
+      because individual file names can be arbitrarily long.) If the
+      standard output is not a login device, the default format is to list
+      one entry per line.  The -C and -x options enable multicolumn formats,
+      and the -m option enables stream output format in which files are
+      listed across the page, separated by commas.  In order to determine
+      output formats for the -C, -x, and -m options, ls uses an environment
+      variable, COLUMNS, to determine the number of character positions
+      available on each output line.  If this variable is not set, the
+      terminfo database is used to determine the number of columns, based on
+      the environment variable TERM.  If this information cannot be
+      obtained, 80 columns is assumed.
+
+      The command lc functions the same as ls except that the lc default
+      output is columnar, even if output is redirected.
+
+    Options
+      ls recognizes the following options:
+
+
+
+ Hewlett-Packard Company	    - 1 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+	   -a	List all entries; usually entries whose names begin with a
+		period (.) are not listed.
+
+	   -b	List nonprinting characters in the octal \ddd notation.
+
+	   -c	Use time of last modification of the inode (file created,
+		mode changed, etc.) for sorting (-t) or printing (-l (ell)).
+
+	   -d	If an argument is a directory, list only its name (not its
+		contents); often used with -l (ell) to get the status of a
+		directory.
+
+	   -e	List the extent attributes of the file.	 If any of the files
+		has a extent attribute, this option lists the extent size,
+		space reserved and allocation flags.  This option must be
+		used with the -l (ell) option.
+
+	   -f	Interpret each argument as a directory and list the name
+		found in each slot.  This option disables -l (ell), -r, -s,
+		and -t, and enables -a; the order is the order in which
+		entries appear in the directory.
+
+	   -g	Same as -l (ell), except that only the group is printed
+		(owner is omitted).  If both -l (ell) and -g are specified,
+		the owner is not printed.
+
+	   -i	For each file, list the inode number in the first column of
+		the report.  When used in multicolumn output, the number
+		precedes the file name in each column.
+
+	   -l	(ell) List in long format, giving mode, number of links,
+		owner, group, size in bytes, and time of last modification
+		for each file (see further DESCRIPTION and Access Control
+		Lists below).  If the time of last modification is greater
+		than six months ago, or any time in the future, the year is
+		substituted for the hour and minute of the modification
+		time.  If the file is a special file, the size field
+		contains the major and minor device numbers rather than a
+		size.  If the file is a symbolic link, the filename is
+		printed, followed by -> and the pathname of the referenced
+		file.
+
+	   -m	Stream output format.
+
+	   -n	The same as -l, (ell) except that the owner's UID and
+		group's GID numbers are printed, rather than the associated
+		character strings.
+
+	   -o	The same as -l, (ell) except that only the owner is printed
+		(group is omitted).  (If both -l (ell) and -o are specified,
+		the group is not printed).
+
+
+
+ Hewlett-Packard Company	    - 2 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+	   -p	Put a slash (/) after each file name if that file is a
+		directory.
+
+	   -q	List nonprinting characters in file names as the character
+		(?).
+
+	   -r	Reverse the order of sort to get reverse (descending)
+		collation or oldest first, as appropriate.
+
+	   -s	List size in blocks, including indirect blocks, for each
+		entry.	The first entry listed is the total number of blocks
+		in the directory.  When used in multicolumn output, the
+		number of blocks precedes the file name in each column.	 The
+		number of indirect blocks in a file is filesystem dependent.
+
+	   -t	Sort by time modified (latest first) before sorting
+		alphabetically.
+
+	   -u	Use time of last access instead of last modification for
+		sorting (-t option) or printing (-l (ell) option).
+
+	   -x	List multicolumn output with entries sorted across rather
+		than down the page.
+
+	   -A	The same as -a, except that the current directory . and
+		parent directory .. are not listed.  For a user with
+		appropriate privileges, this flag defaults to on, and is
+		turned off by -A.
+
+	   -C	List multicolumn output with entries sorted down the
+		columns.
+
+	   -F	After each file name, put one of:
+
+		+  A slash (/) if the file is a directory or a symbolic link
+		   to a directory.
+		+  An asterisk (*) if the file is executable;
+		+  An at-sign (@) if the file is a symbolic link to a file;
+		+  A vertical bar (|) if the file is a fifo.
+
+	   -L	If the argument is a symbolic link, list the file or
+		directory to which the link refers rather than the link
+		itself.
+
+	   -R	Recursively list subdirectories encountered.
+
+	   -1	(one) List the file names in single column format regardless
+		of the output device.  This forces single column format to
+		the user's terminal.
+
+
+
+
+
+ Hewlett-Packard Company	    - 3 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+      Specifying more than one of the options in the following mutually
+      exclusive pairs is not considered an error: -C and -l (ell), -m and -l
+      (ell), -x and -l (ell), -C and -1 (one), and -c and -u.
+
+      ls is known by several shorthand-version names for the various
+      formats:
+
+	   l	is equivalent to ls -m
+	   ll	is equivalent to ls -l (ell)
+	   lsf	is equivalent to ls -F
+	   lsr	is equivalent to ls -R
+	   lsx	is equivalent to ls -x
+
+      The shorthand notations are implemented as links to ls.  Option
+      arguments to the shorthand versions behave exactly as if the long form
+      above had been used with the additional arguments.
+
+      Mode Bits Interpretation (-l option)
+      The mode printed in listings produced by the -l (ell) option consists
+      of 10 characters, for example, -rwxr-xr-x.
+
+      The first character indicates the entry type:
+
+	   b	Block special file
+	   c	Character special file
+	   d	Directory
+	   l	Symbolic link
+	   n	Network special file
+	   p	Fifo (also called a "named pipe") special file
+	   s	Socket
+	   -	Ordinary file
+
+      The next 9 characters are interpreted as three sets of three
+      characters each which identify access and execution permissions for
+      the owner, group, and others categories, as described in chmod(1).
+      The - indicates the permission is not granted.  The various
+      permissions can be put together in any combination, except that the x,
+      s, S, t, and T characters are mutually exclusive, as implied below.
+
+	   -r--------	  Read by owner
+	   --w-------	  Write by owner
+	   ---x------	  Execute (or search directory) by owner; do not set
+			  user ID on execution
+	   ---s------	  Execute/search by owner; set user ID on execution
+	   ---S------	  No execute/search by owner; set user ID on
+			  execution
+	   ----r-----	  Read by group
+	   -----w----	  Write by group
+	   ------x---	  Execute/search by group; do not set group ID on
+			  execution
+
+
+
+
+ Hewlett-Packard Company	    - 4 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+	   ------s---	  Execute/search by group; set group ID on execution
+	   ------S---	  No execute/search by group; set group ID on
+			  execution
+	   -------r--	  Read by others
+	   --------w-	  Write by others
+	   ---------x	  Execute/search by others; do not set sticky bit on
+			  execution
+	   ---------t	  Execute/search by others; set sticky bit on
+			  execution
+	   ---------T	  No execute/search by others; set sticky bit on
+			  execution
+
+      The mode characters are interpreted as follows:
+
+	   -	Deny all permissions in the corresponding position.
+
+	   r	Grant read permission to the corresponding user class.
+
+	   w	Grant write permission to the corresponding user class.
+
+	   x	Grant execute (or search in directory) permission to the
+		corresponding user class.
+
+	   s	Grant execute (search) permission to the corresponding user
+		class.	Execute the file as if by the owner (set user ID,
+		SUID) or group (set group ID, SGID), as indicated by
+		position.
+
+	   S	Deny execute (search) permission to the corresponding user
+		class.	Execute the file as if by the owner (set user ID,
+		SUID) or group (set group ID, SGID), as indicated by
+		position.
+
+	   t	Grant execute (search) permission to others.  The "sticky"
+		(save text image) bit is set (see the description of S_ISVTX
+		in chmod(2)).
+
+	   T	Deny execute (search directory) permission to others.  The
+		"sticky" (save text image) bit is set.
+
+      When an option is specified that results in a listing of directory
+      and/or file sizes in bytes or blocks (such as the -s or -l (ell)
+      option), a total count of blocks, including indirect blocks, is also
+      printed at the beginning of the listing.
+
+    Access Control Lists (ACLs)
+      If a file has optional ACL entries, the -l (ell) option displays a
+      plus sign (+) after the file's permissions.  The permissions shown are
+      a summary representation of the file's access control list, as
+      returned by stat() in the st_mode field (see stat(2)).  To list the
+      contents of an access control list, use the lsacl command (see
+
+
+
+ Hewlett-Packard Company	    - 5 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+      lsacl(1) and acl(5)).
+
+ EXTERNAL INFLUENCES
+    Environment Variables
+      If the COLUMNS variable is set, ls uses the width provided in
+      determining positioning of columnar output.
+
+      LANG determines the locale to use for the locale categories when both
+      LC_ALL and the corresponding environment variable (beginning with LC_)
+      do not specify a locale.	If LANG is not set or is null, it defaults
+      to C (see lang(5)).
+
+      LC_COLLATE determines the order in which the output is sorted.
+
+      LC_CTYPE determines which characters are classified as nonprinting for
+      the -b and -q options, and the interpretation of single- and/or
+      multibyte characters within file names.
+
+      LC_TIME determines the date and time strings output by the -g, -l
+      (ell), -n, and -o options.
+
+      LC_MESSAGES determines the language in which messages (other than the
+      date and time strings) are displayed.
+
+      If any internationalization variable contains an invalid setting, they
+      all default to C (see environ(5)).
+
+    International Code Set Support
+      Single- and multibyte character code sets are supported.
+
+ RETURN VALUE
+      ls exits with one of the following values:
+
+	    0	All input files were listed successfully.
+
+	   >0	ls was aborted because errors occurred when accessing files.
+		The following conditions cause an error:
+
+		+  Specified file not found.
+		+  User has no permission to read the directory.
+		+  Process could not get enough memory.
+		+  Invalid option specified.
+
+ EXAMPLES
+      Print a long listing of all the files in the current working directory
+      (including the file sizes).  List the most recently modified
+      (youngest) file first, followed by the next older file, and so forth,
+      to the oldest.  Files whose names begin with a . are also printed.
+
+	   ls -alst
+
+
+
+
+ Hewlett-Packard Company	    - 6 -  HP-UX Release 11.00: October 1997
+
+
+
+
+
+
+ ls(1)								       ls(1)
+
+
+
+
+ WARNINGS
+      Setting options based on whether the output is a login (tty) device is
+      undesirable because ls -s is very different from ls -s | lp.  On the
+      other hand, not using this setting makes old shell scripts that used
+      ls almost inevitably fail.
+
+      Nonprinting characters in file names (without the -b or -q option) may
+      cause columnar output to be misaligned.
+
+ DEPENDENCIES
+    NFS
+      The -l (ell) option does not display a plus sign (+) after the access
+      permission bits of networked files to represent existence of optional
+      access control list entries.
+
+ AUTHOR
+      ls was developed by AT&T, the University of California, Berkeley and
+      HP.
+
+ FILES
+      /etc/group		    For group IDs for -l (ell) and -g.
+      /etc/passwd		    For user IDs for -l (ell) and -o.
+      /usr/share/lib/terminfo/?/*   For terminal information.
+
+ SEE ALSO
+      chmod(1), find(1), lsacl(1), stat(2), acl(5).
+
+ STANDARDS CONFORMANCE
+      ls: SVID2, SVID3, XPG2, XPG3, XPG4, POSIX.2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Hewlett-Packard Company	    - 7 -  HP-UX Release 11.00: October 1997
+
+
+

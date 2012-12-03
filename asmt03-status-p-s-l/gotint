@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# gotint - display 'got INT' message in response to a SIGINT
+#  the basic shell script simply sleeps in $incr second intervals for 
+#  five minutes
+#
+#
+#
+trap 'echo got INT' INT
+#
+typeset -i nsecs=5*60 i=0 incr=3
+while [ $i -lt $nsecs ]; do
+    sleep $incr
+    ((i+=incr))
+done
+exit 0

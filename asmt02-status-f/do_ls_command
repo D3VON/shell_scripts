@@ -1,0 +1,111 @@
+#!/bin/bash
+
+fatal() {
+    # fatal - outputs a fatal error message to stderr and exits.
+    #     Uses the function error() to output the error message.
+    error $*
+    exit 1
+}
+
+error() {
+    # Outputs an error message to stderr.
+    # Keeps track of whether errors have been seen.
+    # SETS A GLOBAL VARIABLE errors_seen TO INDICATE AN ERROR HAS BEEN SEEN!
+    typeset progname=$(basename $0)
+    errors_seen=true
+    echo "$progname: error: $*" >&2
+	echo "$progname: usage: $progname OPTION LIST (options aren't optional)" >&2
+}
+
+
+#this works fine for lists of files, but not for "." directory
+for i in "$@"
+do
+	if [ "$OS" = "Linux" ]; then  #Gets octal permissions if it's in Linux
+		octalperms=`stat --format=%a $1`
+	fi
+
+	#Breaks up the 'ls' command into it's components
+	#See descriptive variables  here to see what's grabbed by awk and sed.
+	field1=`ls -l $1 | awk '$1 !~ /total/ { print $1 ; }'`
+	field2=`ls -l $1 | awk '$1 !~ /total/ { print $2 ; }'`
+	field3=`ls -l $1 | awk '$1 !~ /total/ { print $3 ; }'`
+	field4=`ls -l $1 | awk '$1 !~ /total/ { print $4 ; }'`
+	field5=`ls -l $1 | awk '$1 !~ /total/ { print $5 ; }'`
+	field9=`ls -l $1 | awk '$1 !~ /total/ { print $9 ; }'`
+	uidnumeric=`ls -n $1 | awk '$1 !~ /total/ { print $3 ; }'`
+	gidnumeric=`ls -n $1 | awk '$1 !~ /total/ { print $4 ; }'`
+	sizeblocks=`ls -s $1 | awk '$1 !~ /total/ { print $1 ; }'`
+done
+
+	filetype_char=`echo $field1 | sed 's/r.*$//'`
+	symbolperms=`echo $field1 | sed 's/^.//'`
+	rawpermissions=$field1
+	links=$field2
+	username=$field3
+	groupname=$field4
+	sizebytes=$field5 # directories aren't supposed to output this
+	filename=$field9  # so it could throw off this field sequence --look into it
+
+	case "$filetype_char" in
+		-) filetype="regular file" ;;
+		b) filetype="block special file" ;;
+		c) filetype="character special file" ;;
+		d) filetype="directory" ;;
+		m) filetype="XENIX shared data (memory)" ;;
+		n) filetype="network special file" ;;
+		p) filetype="fifo (named pipe)" ;;
+		s) filetype="XENIX semaphore (socket)" ;;
+		l) filetype="symbolic link" ;;
+		*) error filetype not detected.  What to do? ;;
+	esac
+
+if [ "$filetype_char" = "d" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the directory '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$OS" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "              Number of subdirectories: $links"
+echo "                    Owner of directory: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "         Directory's size in 1k blocks: $sizeblocks"
+
+elif [ "$filetype_char" = "-" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$OS" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "                  File's size in bytes: $sizebytes"
+echo "              File's size in 1k blocks: $sizeblocks"
+
+else
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$OS" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+
+fi

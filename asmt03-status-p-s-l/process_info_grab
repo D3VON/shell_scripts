@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo "hi, this is process data!"
+echo
+
+
+process=$1
+                        ############I have t"
+echo
+
+
+process=$1
+        t!
+pState=`cat /proc/"$process"/stat | cut -d' ' -f3`
+
+# I appologise for using cut like this
+pFilename=`cat /proc/"$process"/stat | cut -d' ' -f2 |
+                                       cut -d'(' -f2 | cut -d')' -f1`
+pParent=`cat /proc/"$process"/stat | cut -d' ' -f4`
+
+echo State: $pState
+echo Filename: $pFilename
+echo Parent: $pParent
+
+

@@ -1,0 +1,134 @@
+Script started on Wed Feb  4 05:32:23 2004
+bash-2.04$ #     Devon McBride, cs260 Unix System Administration
+bash-2.04$ id
+uid=20616(dmcbri01) gid=557(b20025) groups=3079(c36502),3081(c36504),3089(c36512),7107(c76109)
+bash-2.04$ pwd
+/students/dmcbri01/cs260/asmt01
+bash-2.04$ date
+Wed Feb  4 05:33:00 PST 2004
+bash-2.04$ cat maillist
+#!/bin/bash
+#  Program Name: maillist
+#        Author: Devon McBride
+#         Class: cs260 - Unix System Administration
+#                MW 5:30 - 7:00
+# Last Modified: 02/04/2004
+#
+# Usage: maillist [-q] CRN#
+# This program makes an email list file from the ccsf group file.
+# The user enters a CRN number (just one) as a arguement.
+# The email list is written to the same directory that the program is
+# run in, as well as shown on the screen.
+# The user may us the [-q] option to run silently.
+#############################################################
+clear
+qmode="x" #making sure
+
+# catches if -q is first arguement, and flags variable $qmode
+if [ "$1" =  "-q" ]; then
+    qmode="-q"
+    shift
+fi
+
+crn=$1 #captures crn if it's been entered correctly
+
+# Checks to see if there are the right number of arguements.
+# since I already shifted away the -q if there was one, 
+# there should only be one arg left.
+if [ $# -ne 1 ]; then
+    # if user selected quiet mode, then no error message.
+    if [ "$qmode" = "-q" ]; then
+	exit 1
+    fi
+
+    progname=$(basename $0)
+    echo "Something's wrong with how you are running this program." >&2
+    echo "You entered these arguements: $*" >&2
+    echo "$progname: usage: $progname [-q] CRN-Number" >&2
+    exit 1
+fi
+
+# I'm not testing to see if /etc/group is OK, I'm running out of time 
+
+# find record that matches our crn; format is predictable 
+# format is predictable, e.g. b99999::6006:jdoe01,....etc...
+line=`grep "^[bc]$crn:" /etc/group`
+
+# testing to see if that crn is valid or returns anything
+if [ "$line" = "" ]; then
+    if [ "$qmode" = "-q" ]; then # quiet mode doesn't report a thing! 
+       exit 0
+    fi
+    echo "      Sorry.  There is no such group."
+    exit 0
+fi
+
+groupname=`echo $line | cut -d: -f1`
+groupID=`echo $line | cut -d: -f3`
+
+# puts userIDs into a temporary file in this directory
+`echo $line | cut -d: -f4 | tr ',' '\n' | sort > temp`
+
+# awkwardly awks userID and @ccsf.edu with a terrible space between
+# and saves to temp again.  I then use sed to eliminate the space  
+# and finally save it to a file named for the crn.
+awk '{print $1, "@ccsf.edu"}' temp | sed 's/ //' > $crn 
+
+# cleans up (removes) temporary file
+rm temp
+
+# counts addresses with numbers (those would be students, not teachers) 
+count=`grep -c [0-9] $crn`
+abspath=`pwd`
+if [ "$qmode" = "-q" ]; then
+    exit 0
+else
+    echo " Absolute path for email list file: $abspath/$crn" 
+    echo "                        CRN Number: $crn"
+    echo "                        Group Name: $groupname"
+    echo "                          Group ID: $groupID"
+    echo "                Number of students: $count"
+    echo
+    echo "       And here are the email addresses for CRN# $crn"
+    echo "       -----------------------------------------------" 
+    cat $crn
+fi
+exit 0
+bash-2.04$ maillist 36512
+[2J[H Absolute path for email list file: /students/dmcbri01/cs260/asmt01/36512
+                        CRN Number: 36512
+                        Group Name: c36512
+                          Group ID: 3089
+                Number of students: 11
+
+       And here are the email addresses for CRN# 36512
+       -----------------------------------------------
+byu05@ccsf.edu
+dmcbri01@ccsf.edu
+dwong04@ccsf.edu
+gboyd@ccsf.edu
+imcleo01@ccsf.edu
+jahear02@ccsf.edu
+knelso02@ccsf.edu
+kpang02@ccsf.edu
+mbryle01@ccsf.edu
+mmclau02@ccsf.edu
+mpined04@ccsf.edu
+sstils01@ccsf.edu
+bash-2.04$ maillist -q 75922
+[2J[Hbash-2.04$ echo $?
+0
+bash-2.04$ ls -l 75922
+-rw-------   1 dmcbri01   b20025        1284 Feb  4 05:33 75922
+bash-2.04$ maillist xxxxxxxxxxx
+[2J[H      Sorry.  There is no such group.
+bash-2.04$ maillist -q xxxx
+[2J[Hbash-2.04$ maillist 75922 36512
+[2J[HSomething's wrong with how you are running this program.
+You entered these arguements: 75922 36512
+maillist: usage: maillist [-q] CRN-Number
+bash-2.04$ maillist -q
+[2J[Hbash-2.04$ exit
+exit
+
+script done on Wed Feb  4 05:34:51 2004

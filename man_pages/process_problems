@@ -1,0 +1,45 @@
+My process problems
+
+
+[dmcbri01@moe process]$ catchall 
+catchall: sleeping for 300 seconds. signal me to awaken.
+		#I suspended the fg job with '^z' here
+[1]+  Stopped                 catchall
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 23607 22773  0 03:05 pts/0    00:00:00 /bin/bash ./catchall
+dmcbri01 23609 23607  0 03:05 pts/0    00:00:00 sleep 4
+dmcbri01 23610 22773  0 03:05 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill -CONT 23607
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 23607 22773  0 03:05 pts/0    00:00:00 /bin/bash ./catchall
+dmcbri01 23609 23607  0 03:05 pts/0    00:00:00 sleep 4
+dmcbri01 23612 22773  0 03:05 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ jobs
+[1]+  Stopped                 catchall
+[dmcbri01@moe process]$ kill -CONT 1
+-bash: kill: (1) - Operation not permitted
+[dmcbri01@moe process]$ I can't get catchall (job #1) restarted again!!!
+
+AND IT'S HARD TO KILL!
+
+[dmcbri01@moe process]$ kill 23607
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 23607 22773  0 03:05 pts/0    00:00:00 /bin/bash ./catchall
+dmcbri01 23609 23607  0 03:05 pts/0    00:00:00 sleep 4
+dmcbri01 23617 22773  0 03:10 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill -HUP 23607
+[dmcbri01@moe process]$ ps -f
+UID        PID  PPID  C STIME TTY          TIME CMD
+dmcbri01 22773 22772  0 02:06 pts/0    00:00:00 -bash
+dmcbri01 23607 22773  0 03:05 pts/0    00:00:00 /bin/bash ./catchall
+dmcbri01 23609 23607  0 03:05 pts/0    00:00:00 sleep 4
+dmcbri01 23618 22773  0 03:10 pts/0    00:00:00 ps -f
+[dmcbri01@moe process]$ kill -KILL 23607
+[1]+  Killed                  catchall
+[dmcbri01@moe process]$ 

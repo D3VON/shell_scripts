@@ -1,0 +1,112 @@
+#TOP
+
+# Check to see if all the files in the list exist.
+if [ !-a "$1" ]; then
+	error $1 isn't a valid file.  It doesn't seem to exist.
+fi
+
+# Gets octal permissions if it's in Linux.
+if [ "$system" = "Linux" ]; then  
+	typeset octalperms=`stat --format=%a $1`
+fi
+
+# Checks to see if the file is a directory. Directories are trouble.
+if [ -d $1 ]; then
+	typeset filetype_char="d"
+
+	#Breaks up 'ls' into it's components (only for directories here)
+	#See descriptive variables  here to see what's grabbed by awk and sed.
+	typeset rawpermissions=`ls -dl $1 | awk '{ print $1 ; }'`
+	typeset links=`ls -dl $1 | awk '{ print $2 ; }'`
+	typeset username=`ls -dl $1 | awk '{ print $3 ; }'`
+	typeset groupname=`ls -dl $1 | awk '{ print $4 ; }'`
+	typeset filename=`ls -dl $1 | awk '{ print $9 ; }'`  
+	typeset uidnumeric=`ls -dln $1 | awk '{ print $3 ; }'`
+	typeset gidnumeric=`ls -dln $1 | awk '{ print $4 ; }'`
+	typeset sizeblocks=`ls -dls $1 | awk '{ print $1 ; }'`
+
+	# Weedles out the symbolic permissions.
+	typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+else
+	#Breaks up the 'ls' command into it's components
+	#See descriptive variables  here to see what's grabbed by awk and sed.
+	typeset rawpermissions=`ls -l $1 | awk '{ print $1 ; }'`
+	typeset links=`ls -l $1 | awk '{ print $2 ; }'`
+	typeset username=`ls -l $1 | awk '{ print $3 ; }'`
+	typeset groupname=`ls -l $1 | awk '{ print $4 ; }'`
+	typeset sizebytes=`ls -l $1 | awk '{ print $5 ; }'` 
+	typeset filename=`ls -l $1 | awk '{ print $9 ; }'`  
+	typeset uidnumeric=`ls -n $1 | awk '{ print $3 ; }'`
+	typeset gidnumeric=`ls -n $1 | awk '{ print $4 ; }'`
+	typeset sizeblocks=`ls -s $1 | awk '{ print $1 ; }'`
+
+	# Weedles out the type character and the symbolic permissions.
+	typeset filetype_char=`echo $rawpermissions | sed 's/r.*$//'`
+	typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+fi
+
+# 'Expands' the file type character extracted earlier 
+# to be a user-friendly word. 
+case "$filetype_char" in
+	-) typeset filetype="regular file" ;;
+	b) typeset filetype="block special file" ;;
+	c) typeset filetype="character special file" ;;
+	d) typeset filetype="directory" ;;
+	m) typeset filetype="XENIX shared data (memory)" ;;
+	n) typeset filetype="network special file" ;;
+	p) typeset filetype="fifo (named pipe)" ;;
+	s) typeset filetype="XENIX semaphore (socket)" ;;
+	l) typeset filetype="symbolic link" ;;
+	*) error filetype not detected.  What to do? ;;
+esac
+
+# OUTPUT TO STDOUT: depending on the type: directory, regular, or other
+if [ "$filetype_char" = "d" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the directory '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "              Number of subdirectories: $links"
+echo "                    Owner of directory: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "         Directory's size in 1k blocks: $sizeblocks"
+
+elif [ "$filetype_char" = "-" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "                  File's size in bytes: $sizebytes"
+echo "              File's size in 1k blocks: $sizeblocks"
+
+else
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+	echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+
+fi

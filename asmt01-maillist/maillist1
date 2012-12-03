@@ -1,0 +1,51 @@
+#!/bin/bash
+#  Program Name: maillist
+#        Author: Devon McBride
+#         Class: cs260 - Unix System Administration
+#                MW 5:30 - 7:00
+# Last Modified: 02/04/2004
+#
+# Usage: maillist [-q] CRN#
+# This program makes an email list file from the ccsf group file.
+# The user enters a CRN number (just one) as a arguement.
+# The email list is written to the same directory that the program is
+# run in, as well as shown on the screen.
+# The user may us the [-q] option to run silently.
+##############################################################################
+# checks to see if there are enough arguements
+if [ $# -eq 0 ]; then
+     error
+fi
+
+# if user entered too many args, appropriate error is invoked
+if [ $# -gt 2 ]; then                                                          
+    errorflag=1
+    error "$errorflag"
+fi
+
+# Fatal error messages if arguements are incorrect.
+error() {
+    # if user selected quiet mode, then no error message.
+    if [ "$1" = 0 ]; then
+        exit 1
+    else
+        if [ "$1" = 1 ]; then
+            echo "Too many arguements used.\n" >&2
+        fi
+        if [ "$1" = 2 ] # when CRN isn't found in /etc/group file
+            echo "That CRN wasn't found.  Try again please.\n" >&2
+        fi
+        typeset progname=$(basename $0)
+        echo "$progname: ERROR: $*" >&2
+        echo "$progname: usage: $progname [-q] CRN-Number" >&2
+        echo "$progname: ERROR: $*" >&2
+        echo "$progname: usage: $progname [-q] CRN-Number" >&2
+        exit 1
+    fi
+}
+
+#catches if -q is first arguement, and flags variable $qmode
+if [ "$1" =  "-q" ]; then
+    qmode=0
+    shift
+fi

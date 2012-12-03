@@ -1,0 +1,430 @@
+#!/bin/bash
+#  Program Name: status
+#        Author: Devon McBride
+#         Class: cs260 - Unix System Administration
+#                MW 5:30 - 7:00
+# Last Modified: 04/01/2004
+# 
+# This program is designed to assist anyone who wants to get system
+# information about objects (files, directories, devices, and so on) 
+# as well as processes.  
+# This program will run on HP-UX and Linux (9)
+# The *file* option is available on both platforms.
+#     -but it cannot handle files with embedded spaces. 
+# The *process* option is only availabe on Linux.
+#
+# USAGE: status MODE [file] [file] [file] etc...
+#         where MODE is -p, -s, -f with a file or list, or
+#                      -l with time 
+#
+
+#############################################################################
+#############################################################################
+fatal() {
+    # fatal - outputs a fatal error message to stderr and exits.
+    #     Uses the function error() to output the error message.
+    error $*
+    exit 1
+}
+#############################################################################
+#############################################################################
+error() {
+    # Outputs an error message to stderr.
+    # Keeps track of whether errors have been seen.
+    # SETS A GLOBAL VARIABLE errors_seen TO INDICATE AN ERROR HAS BEEN SEEN!
+    typeset progname=$(basename $0)
+    errors_seen=true
+    echo -e "$progname: error: $*" >&2
+    echo "$progname: usage: $progname { -p | -f } list-of-files" >&2
+}
+
+#############################################################################
+#############################################################################
+checkmode() {
+    # checkmode() tests to see if the first arguement is an acceptable mode. 
+    # This function takes one arguement ($1), which is what the user entered
+    # as the option.
+    # The $mode variable this case statement returns is *global*.
+    case "$1" in
+        -p) if [ "$system" != "Linux" ]; then  
+                fatal "Sorry, option '-p' only works on linux" 
+            fi 
+            mode="process" ;;
+        -s) fatal "The '-s' option is not yet available." ;;
+        -f) mode="file" ;;
+        -l)    fatal "The '-l' option is not yet available." ;;
+         *) fatal Option unknown or missing ;;
+    esac
+}
+
+#############################################################################
+#############################################################################
+default_list() {
+    # Default_list outputs the default list of things to work on
+    # if no files or processes were given as arguements.  
+    # If $mode is set to 'file', the default list consists of a list of visable
+    # items in the current directory. 
+    # If $mode is set to 'process', the default list consists of a list of
+    # processes that the user is currently running 
+    # (not including the processes of this program).
+    # This function takes one arg: the type of things status is 
+    # requested on ($1). 
+    typeset mode=$1 
+
+    # Here is where the function returns data for the $list variable in main. 
+    if [ "$mode" = "file" ]; then
+        ls
+    elif [ "$mode" = "process" ]; then
+        # grep from a ls of proc for the user's logname.  Each of the user's
+        # processes shows up there (unfortunately including this program's 
+        # processes, which are dealt with later).  So, awk will return just
+        # the pid field from each line that contains the user's logname.
+        ls -l /proc | grep "$LOGNAME" | awk '{ print $9 ; }'
+        
+        # flags (with a global variable) that the list of processes
+        # was generaged by the default_list () function.
+        defgen="yes"
+    fi
+}
+
+#############################################################################
+#############################################################################
+dofile() {
+
+    # Generate status information for a single file on
+    #    the indicated system
+    # There are two arguments: $1 is the system; $2 is the file path
+    # I'm putting them in local variables for you
+    typeset system=$1 file=$2 
+
+    # Check to see if the file currently being worked on exists.
+    # If it doesn't exist, shift to get the next one and check it, too.
+    if [ ! -d $file -a ! -e $file ]; then
+        error $file isn't a valid file.  It doesn't seem to exist.
+
+    # This is where it processes everything.
+    else
+        # Gets octal permissions if it's in Linux.
+        if [ "$system" = "Linux" ]; then  
+            typeset octalperms=`stat --format=%a $file`
+        fi
+
+        # Checks to see if the file is a directory.
+        if [ -d $file ]; then
+            typeset filetype_char="d"
+
+            #Breaks up 'ls' into it's components (only for directories here)
+            #See descriptive variables here to see what awk and sed get.
+            typeset rawpermissions=`ls -dl $file | awk '{ print $1 ; }'`
+
+            typeset username=`ls -dl $file | awk '{ print $3 ; }'`
+            typeset groupname=`ls -dl $file | awk '{ print $4 ; }'`
+            typeset filename=`ls -dl $file | awk '{ print $9 ; }'`  
+            typeset uidnumeric=`ls -dln $file | awk '{ print $3 ; }'`
+            typeset gidnumeric=`ls -dln $file | awk '{ print $4 ; }'`
+            typeset sizeblocks=`ls -dls $file | awk '{ print $1 ; }'`
+
+            # We want # of subdirectories in a directory, not the # of links.
+            typeset numsubdirs=`ls -l $file | grep -c '^d.*'`
+    
+            # Weedles out the symbolic permissions.
+            typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+
+            # Checks to see if the file is a device file
+            elif [ -c $file ] || [ -b $file ]; then
+            #Breaks up 'ls' into it's components (only for device files here)
+            #See descriptive variables  here for what's grabbed by awk and sed.
+            typeset rawpermissions=`ls -l $file | awk '{ print $1 ; }'`
+            typeset links=`ls -l $file | awk '{ print $2 ; }'`
+            typeset username=`ls -l $file | awk '{ print $3 ; }'`
+            typeset groupname=`ls -l $file | awk '{ print $4 ; }'`
+            typeset majordevnum=`ls -lL $file | awk '{ print $5 ; }'` 
+            typeset minordevnum=`ls -lL $file | awk '{ print $6 ; }'`
+            typeset filename=`ls -l $file | awk '{ print $10 ; }'`  
+            typeset uidnumeric=`ls -ln $file | awk '{ print $3 ; }'`
+            typeset gidnumeric=`ls -ln $file | awk '{ print $4 ; }'`
+            typeset sizeblocks=`ls -ls $file | awk '{ print $1 ; }'`
+    
+            # Weedles out the type, and the symbolic permissions.
+            typeset filetype_char=`echo $rawpermissions | sed 's/r.*$//'`
+            typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+
+        else
+            #Breaks up the 'ls' command into it's components
+            #See descriptive variables  for what's grabbed by awk and sed.
+            typeset rawpermissions=`ls -l $file | awk '{ print $1 ; }'`
+            typeset links=`ls -l $file | awk '{ print $2 ; }'`
+            typeset username=`ls -l $file | awk '{ print $3 ; }'`
+            typeset groupname=`ls -l $file | awk '{ print $4 ; }'`
+            typeset sizebytes=`ls -l $file | awk '{ print $5 ; }'` 
+            typeset filename=`ls -l $file | awk '{ print $9 ; }'`  
+            typeset uidnumeric=`ls -n $file | awk '{ print $3 ; }'`
+            typeset gidnumeric=`ls -n $file | awk '{ print $4 ; }'`
+            typeset sizeblocks=`ls -s $file | awk '{ print $1 ; }'`
+
+            # Weedles out the type, and the symbolic permissions.
+            typeset filetype_char=`echo $rawpermissions | sed 's/r.*$//'`
+            typeset symbolperms=`echo $rawpermissions | sed 's/^.//'`
+        fi
+
+        # 'Expands' the file type character extracted earlier 
+        # to be a user-friendly word. 
+        case "$filetype_char" in
+            -) typeset filetype="regular file" ;;
+            b) typeset filetype="block special file" ;;
+            c) typeset filetype="character special file" ;;
+            d) typeset filetype="directory" ;;
+            m) typeset filetype="XENIX shared data (memory)" ;;
+            n) typeset filetype="network special file" ;;
+            p) typeset filetype="fifo (named pipe)" ;;
+            s) typeset filetype="XENIX semaphore (socket)" ;;
+            l) typeset filetype="symbolic link" ;;
+            *) error filetype not detected.  What to do? ;;
+        esac
+
+##############################################################################
+##### To make the output look nice, I wanted to use the whole screen.    #####
+##### So that makes the 'if' statements here look messy.                 #####
+##### OUTPUT TO STDOUT: depending on the type:                           #####
+#####                                    directory, regular, or other    #####
+##############################################################################
+if [ "$filetype_char" = "d" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the directory '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+    echo "                           permissions: $symbolperms"
+fi
+echo "              Number of subdirectories: $numsubdirs"
+echo "                    Owner of directory: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "         Directory's size in 1k blocks: $sizeblocks"
+
+elif [ "$filetype_char" = "-" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+    echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "                  File's size in bytes: $sizebytes"
+echo "              File's size in 1k blocks: $sizeblocks"
+
+elif [ "$filetype_char" = "b" ] || [ "$filetype_char" = "c" ]; then
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+    echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+echo "                   Major device number: $majordevnum"
+echo "                   Minor device number: $minordevnum"
+
+else
+
+echo " -----------------------------------------------------------------------"   
+echo "                     Information about the file '$filename' "
+echo " -----------------------------------------------------------------------"
+echo "                              filetype: $filetype"
+if [ "$system" = "Linux" ]; then
+    echo "                           permissions: $symbolperms ($octalperms)"
+else
+    echo "                           permissions: $symbolperms"
+fi
+echo "                  Number of references: $links"
+echo "                         Owner of file: $username (uid=$uidnumeric)"
+echo "                      File is in group: $groupname (gid=$gidnumeric)"
+
+fi
+fi
+}
+
+#############################################################################
+#############################################################################
+doproc() {
+    process=$1
+    progname=$2
+
+## I was going to do more sophysticated testing to weed out processes
+## spawned from this program, so the user wouldn't see them, because 
+## the user wouldn't likely need to know that stuff. But I ran out of time.
+##    prog_pid=`ps -f | grep $progname | awk '$1 !~ /[a-zA-Z]/ { print $2 }'`
+###    if [ "$defgen" = "no" && $progname != "status" && ]; then
+
+        # Test if arguement is valid, i.e. exists as a process right now.
+        testprocess=`ps -f "$process" | grep "$process"`
+        if [ -z "$testprocess" ]; then
+echo   " ---------------------------------------------------------------------"
+echo   "                 '$process' isn't a process right now                 "
+echo   " ---------------------------------------------------------------------"
+            # When processing the default list, the last 6 processes result
+			# from the operation of this script, so ideally no report would
+			# be made of them to the user.  AND the the last process to
+			# produce any actual data for this script is actually this very
+			# program's process.
+
+        else
+
+            # Stores process's info from /proc/$process/stat
+            stat_line=`cat /proc/"$process"/stat`
+
+            # grabs the process's state character
+            statechar=`echo $stat_line | cut -d' ' -f3`
+
+    # Grabs the absolute path of the process that is running.
+    # Watch out: the path of a shell script is likely just /bin/bash
+    # but the path of most other processes should be where they reside
+    # e.g. the sleep command resides at /bin/sleep
+    # Also, I was unable to get many of the paths due to lack of permission.
+
+            path=`readlink /proc/$process/exe`
+           if [ -z $path ]; then
+               path="unavailable"
+           fi
+
+    # watch out: if you're trying to capture a process of a program because
+    # programs contain many processes, therefore, the program itself will
+    # usually look like it's sleeping, when in fact any of it's commands
+    # will likely be running.
+    # translates the process's state into a readable form
+           case "$statechar" in
+               R) state="running or runable" ;;
+               S) state=sleeping ;;
+               I) state=idle ;;
+               T) state=stopped ;;
+               Z) state=zombie ;;
+               D) state="disk wait" ;;
+               W) state="swapped out" ;;
+               N) state="niced: execution priority lowered" ;;
+               \<) state="niced: execution priority artificially raised" ;;
+               *) state="Sorry, I don't know that process state." ;;
+           esac
+
+
+           # Grabs process's name.  I appologise for using cut like this.
+           filename=`echo $stat_line | cut -d' ' -f2 |
+                                       cut -d'(' -f2 | cut -d')' -f1`
+           # Grabs process's parent's ID
+           parent=`echo $stat_line | cut -d' ' -f4`
+
+    # rss value was taken from 'ps' command because the ps man page indicates
+    # that it returns the rss value in kilobytes. This program converts that
+    # value to bytes to match the units of virtual memory given here in bytes.
+    # The units that these commands produce are clearly verified by comparison
+    # with /proc/$process/status.
+    rss=$(( 1000*`ps -yl $process | grep "$process" | awk '{ print $8 ; }'` ))
+    priority=`echo $stat_line | cut -d' ' -f18`
+    nicenum=`echo $stat_line | cut -d' ' -f19`
+    starttime=`ps -f "$process" | grep "$process" | awk '{ print $5 }'`
+    virtmemsz=`echo $stat_line | cut -d' ' -f23`
+    cputime=`ps u "$process" | grep "$process" | awk '{ print $3 ; }'`
+
+echo   " ---------------------------------------------------------------------"
+echo   "                 Information about the process '$process'             "
+echo   " ---------------------------------------------------------------------"
+printf "%15s %-15s\t%25s %-20s\n" "path:" $path "filename:" "$filename"
+printf "%15s %-15s\t%25s %-20s\n" "parent id:" $parent "rss (bytes):" $rss
+printf "%15s %-15s\t" "start time:" $starttime
+printf "%25s %-15s\n" "virtual memory (bytes):" $virtmemsz
+printf "%15s %-15s\t%25s %-20s\n" "nice number:" $nicenum "cpu time:" $cputime
+printf "%15s %-15s\t%25s %-20s\n" "priority:" $priority "state:" $state
+    fi
+
+}
+
+
+
+#############################################################################
+##################################        ###################################
+##################################  MAIN  ###################################
+##################################        ###################################
+#############################################################################
+
+progname=$0 #this program's name
+
+# This handles a -INT signal once, giving a one-time warning to the user.
+# The 2nd time the user issues an -INT signal, the program aborts.
+trap "echo 'Signal INT again to really exit.' ; trap 'exit 1' 2" 2 
+
+# Initialize our flag to indicate there have not been any errors.
+errors_seen=false
+
+# Check the system we are on.
+# Warn user that this script is only guaranteed for Linux and HP-UX.
+system=`uname -s`
+if [ "$system" != "Linux" ] && [ "$system" != "HP-UX" ]; then
+    error WARNING! This script was only designed for Linux and HP-UX.
+fi
+
+# Process the arguments
+# if there's not at least one argument, it's a fatal error.
+if [ $# -eq 0 ]; then
+    fatal An OPTION is required to run this program.
+fi
+
+# The first argument MUST be a valid option. Checked in a special function.
+# The function will set $mode as a global variable.
+checkmode $1
+shift
+
+# This is a global variable that flags whether a list was generated by 
+# the default_list() function or not.
+# defgen="no" -----I decided not to use it.  Ran out of time.
+
+# If there was only one argument, function default_list generates the list
+# of things to work on. 
+# If there are more arguments, the list consists of the rest of the args. 
+if [ $# -ge 1 ]; then
+    list=$@
+else
+    # the function default_list outputs (to standard output)
+    # a list of the default things to work on.  default_list knows to output
+    # the appropriate items, whether they be files in the current directory
+    # or the users currently running processes.
+    list=$(default_list $mode)
+fi
+
+# $list is processed here.  If it's made of processes, it goes to doproc()
+# and if it's made of files, it goes to dofiles()
+# The function is called for each item in list.
+if [ "$mode" = "file" ]; then
+    for item in $list; do
+        dofile "$system" "$item"
+    done
+elif [ "$mode" = "process" ]; then
+    for item in $list; do
+        doproc "$item" "$progname"
+    done
+else
+    fatal "I don't know what happened.  Ask your System Administrator."
+fi
+
+# This is how I tested the -INT signal.  This loop kept the program running.
+# a=1
+# while [ a=1 ]; do 
+#    a=1
+# done
+
+# whether errors were encountered or not
+if [ "$errors_seen" = "true" ]; then
+    exit 1
+fi
+exit 0

@@ -1,0 +1,19 @@
+#!/bin/bash
+#  Program Name: maillist
+#        Author: Devon McBride
+#         Class: cs260 - Unix System Administration
+#                MW 5:30 - 7:00
+# Last Modified: 2004 01/27 
+#
+# This program produces an email list from the group file.  It produces
+# that email list for a crn, given as an arugement.  
+#
+#
+if [ $# -eq 0 -o $# -gt 2 ]; then
+	typeset progname=$(basename $0)
+	echo "$progname: ERROR: $*" >&2
+	echo "progname: usage: $progname [-q] crn-number" >&2
+	echo "woof"
+fi
+echo "woof"
+exit 12

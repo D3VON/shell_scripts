@@ -1,0 +1,20 @@
+#!/bin/bash
+
+getOSName() {
+	case "`uname -s`" in
+		HP-UX) echo hpux > tempo ;;
+		Linux) echo linux > tempo ;;
+		*)     echo unknown > tempo ;;
+	esac
+}
+
+getOSName
+
+
+#gets octal permissions if it's Linux
+#	if [ `uname -s` = "HP-UX" ]; then
+#		echo "this is HP-UX"
+#	elif [ `uname -s` = "Linux" ]; then
+#	    echo "this is Linux"
+#		octalperms=`stat --format=%a $1`
+#	fi

@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+trap "echo 'Signal INT again to really exit.' ; trap 'exit 1' INT" INT
+#
+# 
+while [ 1=1 ]; do
+   a=1
+done

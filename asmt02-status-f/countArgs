@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#testing passing args to a function as one variable
+
+cntArgs() {
+	echo d
+	for i in $@
+	do
+		echo $1
+		shift
+	done
+}
+
+echo a
+files="file1 file2 file3 file4"
+echo b
+
+cntArgs $files
+echo c
+
+#THIS IS THE OUTPUT OF THIS SCRIPT!!!  WOW
+#
+# $ countArgs 
+# a
+# b
+# d
+# file1
+# file2
+# file3
+# file4
+# c
+
+

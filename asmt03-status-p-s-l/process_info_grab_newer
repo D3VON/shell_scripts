@@ -1,0 +1,41 @@
+[dmcbri01@moe asmt03-status-p-s-l]$ vi process_data 
+    N) pState="niced: execution priority lowered" ;;
+    \<) pState="niced: execution priority artificially raised" ;;
+    *) pState="Sorry, I don't know that process state." ;;
+    N) pState="niced: execution priority lowered" ;;
+    \<) pState="niced: execution priority artificially raised" ;;
+    *) pState="Sorry, I don't know that process state." ;;
+    N) pState="niced: execution priority lowered" ;;
+    \<) pState="niced: execution priority artificially raised" ;;
+    *) pState="Sorry, I don't know that process state." ;;
+esac
+
+
+# Grabs process's name.  I appologise for using cut like this.
+pFilename=`echo $stat_line | cut -d' ' -f2 |
+                                       cut -d'(' -f2 | cut -d')' -f1`
+# Grabs process's parent's ID
+pParent=`echo $stat_line | cut -d' ' -f4`
+
+# rss value was taken from 'ps' command because the ps man page indicates
+# that it returns the rss value in kilobytes.
+# This program converts it into bytes to match the units of virtual memory
+
+rss=$(( 1000*`ps -yl $process | grep "$process" | awk '{ print $8 ; }'` ))
+priority=`echo $stat_line | cut -d' ' -f18`
+nicenum=`echo $stat_line | cut -d' ' -f19`
+starttime=`echo $stat_line | cut -d' ' -f22`
+virtmemsz=`echo $stat_line | cut -d' ' -f23`
+echo
+echo
+echo
+echo State: $pState
+echo Filename: $pFilename
+echo Parent: $pParent
+echo process state: $pStateChar
+echo "process's absolute path: $pAbsPath"
+echo virtual memory size in bytes: $virtmemsz
+echo start time: $starttime
+echo nice number: $nicenum
+echo priority: $priority
+echo rss in kilo bytes: $rss

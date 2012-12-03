@@ -1,0 +1,25 @@
+State: stopped
+Filename: infiniteLoop
+Parent: 12812
+process state: T
+process's absolute path: /bin/bash
+virtual memory size in bytes: 4218880
+start time: 04:11
+nice number: 0
+priority: 25
+rss in kilo bytes: 1032000
+cputime: 0.2
+
+echo   " ---------------------------------------------------------------------"
+echo   "                 Information about the process '$processID'           "
+echo   " ---------------------------------------------------------------------"
+printf "%18s %-20s\t%15s %-20s\n" "filename:" "$filename" "path:" "$abspath"
+echo   "            state: $pState ($statechar)"
+printf "%18s %-20s\t%15s %-20s\n" "parent id:" $parent "process state:" $state
+printf "%18s %-20s\t%15s %-20s\n" "virtual memory (bytes):" $virtmemsz
+												"start time:"  $starttime
+printf "%18s %-20s\t%15s %-20s\n" "rss (bytes):" $rss "cpu time:" $cputime
+printf "%18s %-20s\t%15s %-20s\n" "priority:" $priority "nice number:" $nicenum
+
+
+

@@ -1,0 +1,52 @@
+
+
+RUNNING THE	set COMMAND REVEALS ***ALL*** VARIABLES
+
+
+bash-2.04$ set
+BASH=/usr/bin/bash
+BASH_ENV=/students/dmcbri01/.bashrc
+BASH_VERSINFO=([0]="2" [1]="04" [2]="0" [3]="1" [4]="release" [5]="hppa2.0w-hp-hpux11.00")
+BASH_VERSION='2.04.0(1)-release'
+COLUMNS=80
+DIRSTACK=()
+ERASE='^H'
+EUID=20616
+GROUPS=()
+HISTFILE=/students/dmcbri01/.bash_history
+HISTFILESIZE=500
+HISTSIZE=500
+HOME=/students/dmcbri01
+HOSTNAME=hills
+HOSTTYPE=hppa2.0w
+IFS=' 
+'
+LESS=-efM
+LINES=24
+LOGNAME=dmcbri01
+MACHTYPE=hppa2.0w-hp-hpux11.00
+MAIL=/var/mail/dmcbri01
+MAILCHECK=60
+MANPATH=/usr/share/man/%L:/usr/share/man:/usr/contrib/man/%L:/usr/contr
+OLDPWD=/pub/cs/gboyd/cs260/basics/diff
+OPTERR=1
+OPTIND=1
+OSTYPE=hpux11.00
+PATH=/usr/bin:/usr/local/bin:/opt/ansic/bin:/usr/ccs/bin:/opt/perl5/bin:
+PIPESTATUS=([0]="127")
+PPID=17434
+PS1='\s-\v\$ '
+PS2='> '
+PS4='+ '
+PWD=/students/dmcbri01/cs260/man_pages
+SHELL=/usr/bin/bash
+SHELLOPTS=braceexpand:hashall:histexpand:monitor:interactive-comments:emacs
+SHLVL=1
+SSH_CLIENT='63.205.67.8 33578 22'
+SSH_TTY=/dev/pts/0
+TERM=vt100
+TZ=PST8PDT
+UID=20616
+USER=dmcbri01
+_=SET
+uid=20616

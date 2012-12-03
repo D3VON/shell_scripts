@@ -1,0 +1,21 @@
+#!/bin/bash
+# program name: default_processes
+
+# the user's default processes
+
+# I HAVE TO GET RID OF 1ST COLUMN (HEADINGS)
+# and don't grab the processes that are spawned by this little script!
+
+# get the user's bash process, which is the parent of all the user's
+# other processes.
+
+default_pids=`ls -l /proc | grep "$LOGNAME" | awk '{ print $9 ; }'`
+
+
+
+#user_bash_pid=`ps -f | grep "bash" | awk '{ print $2 ; }'`
+#echo $user_bash_pid
+
+#default_processes=`ps -f | awk '($3 ~ user_bash_pid) { print $2 ;  }'`
+
+echo $default_pids

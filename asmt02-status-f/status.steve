@@ -1,0 +1,164 @@
+#!/bin/bash
+#
+# Assignment # 03
+# By Steve Stilson
+# This script returns status on various items.
+# Using the -f flag will return status on a given filename.
+# If there is no filename after the -f flag, it returns
+# status on each item found in the current directory. 
+#
+
+# the functions come first
+
+fatal() {
+    #
+    # fatal - output a fatal error message to stderr and exit
+    #     uses the function error() to output the error message.
+    #
+    error $*
+    exit 1
+}
+
+error() {
+    #
+    # output an error message to stderr.
+    # keeps track of whether errors have been seen or not!
+    # SETS A GLOBAL VARIABLE errors_seen TO INDICATE AN ERROR HAS BEEN SEEN!
+    #
+    typeset progname=$(basename $0)
+    # $0 is the script you're running
+    (( errors_seen+=1 ))
+    echo -e "$progname: error: $*" >&2
+}
+
+default_list() {
+    # default_list outputs the default list of things to work on
+    #   (via standard output)
+    # it takes two arguments: the system ($1) and the type of things
+    #   status is requested on ($2). 
+    # for assignment two, the only possibility for $2 is "file"
+    #   and $1 (system) doesn't matter
+    # echo "2 is $2"
+    if [ "$mode" != "file" ]; then
+	fatal "inconsistent mode in default_list ($mode)"
+    fi
+    # whatever goes to standard output is command-substituted 
+    # into the list
+    ls -1
+}
+
+
+dofile() {
+    # Here's where the work is done in assignment two.
+    # Generate status information for a single file on
+    #    the indicated system
+    # There are two arguments: $1 is the system; $2 is the file path
+    typeset system=$1
+    shift 1
+    typeset file=$*
+    #
+    # Be sure and typeset your variables so that they are not global!
+    # Parameters sent to this routine are files only.
+    typeset infoline=`ls -lsd $file | tr -s ' '`
+    if [ $? -ne 0 ]; then
+       echo "No such file as $file."
+       exit 1
+    fi
+    typeset filetype=`echo $infoline | cut -d' ' -f2 | cut -c1`
+    echo -n "$file is a "
+    case "$filetype" in
+      '-')
+         echo -n "Regular file" ;;
+      'd')
+         echo -n "Directory" ;;
+      'c')
+         echo -n "Special character file" ;;
+      'p')
+         echo -n "Named pipe" ;;
+      'l')
+	 echo -n "Symbolic link" ;;
+          # For symbolic links, I've chosen to show the perms of the link,
+          # not what it points to. Same with owner and group.
+      *)
+         echo -n "Something else" ;;
+     esac
+    echo -n ". It is owned by "
+    typeset owner=`echo $infoline | cut -d' ' -f4`
+    echo -n $owner
+    echo " (uid = `id -u $owner`) "
+    typeset groupnum=`echo $infoline | cut -d' ' -f5`
+    echo "and is in group $groupnum (gid = `id -g $owner`)."
+    if [ "$filetype" = 'c' ]; then
+        typeset mj=`echo $infoline | cut -d' ' -f6`
+	typeset mn=`echo $infoline | cut -d' ' -f7`
+        echo "Its major number is $mj, and its minor number is $mn."
+    else
+        echo -n "It takes up "
+        typeset blox=`echo $infoline | cut -d' ' -f1`
+        echo -n "$blox 1K disk blocks, and "
+        typeset bytes=`echo $infoline | cut -d' ' -f6`
+        echo -n "$bytes bytes. Its permissions are: "
+        echo $infoline | cut -d' ' -f2
+    fi
+    typeset linx=`echo $infoline | cut -d' ' -f3`
+    if [ "$filetype" = 'd' ]; then
+        (( linx-=2 ))
+        echo "It has $linx subdirectories."
+    else
+        echo "It has $linx links."
+    fi
+    echo
+}
+
+#---------------------------------------------
+# the main program
+
+# Initialize our flag to indicate there have not been any errors.
+errors_seen=0
+
+# Check the system we are on. 
+# Use the uname command. If it contains 'linux', set the 
+# variable 'system' to indicate linux. If it indicates
+# HP-UX, set it appropriately.
+system=$uname
+
+# process the arguments
+# if there's not at least one argument, it's a fatal error.
+if [ "$#" -lt 1 ]; then
+     fatal "Too few arguments"
+fi
+
+# the first argument MUST be a valid option. (In the case of
+# asmt 2 it must be -f. Later it can be other things.)
+if [ "$1" != '-f' ]; then
+	echo "Option 1 not -f.  Exiting."
+	exit 1
+fi
+mode=file
+
+# if there was only one argument, you must generate the list
+# of things to work on. if there are more arguments, the list 
+# consists of the rest of the arguments! 
+if [ $# -gt 1 ]; then
+	shift 1
+	list=$*
+else
+    # the function default_list outputs (to standard output)
+    # a list of the default things to work on. It's JUST the filenames now.
+    list=$(default_list $system "file")
+    echo "$list" > tmpFile 
+fi
+
+# The rest of the main program is simple:
+# You have a function to do one file.
+# Simply call it for each item in your list!
+while read item; do
+    echo Now sending "$item" to be processed.
+    dofile "$system" "$item"
+done < tmpFile
+
+# now simply exit with the exit status set depending on 
+# whether errors were encountered or not
+echo
+exit $errors_seen
+

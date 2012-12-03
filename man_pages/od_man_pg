@@ -1,0 +1,229 @@
+ od(1)								       od(1)
+
+ NAME
+      od, xd - octal and hexadecimal dump
+
+ SYNOPSIS
+      od [-v] [-A address_base] [-j skip] [-N count] [-t type_string] ...
+	   [file ...]
+
+      xd [-v] [-A address_base] [-j skip] [-N count] [-t type_string] ...
+	   [file ...]
+
+    Supported Pre-POSIX Usage
+      od [-bcdosx] [file] [[+][0x]offset[.][b]]
+
+      xd [-bcdosx] [file] [[+][0x]offset[.][b]]
+
+ DESCRIPTION
+      od and xd concatenate one or more input files and write their contents
+      to standard output in a user-specified format.  If file is not
+      specified, the standard input is used.
+
+    Options and Arguments
+      od and xd recognize the following options and command-line arguments:
+
+	   -A address_base   Specify the input offset base.  address_base is
+			     a single character that defines which format
+			     the offset base is written in:
+
+				  d    Decimal format.
+				  o    Octal format.
+				  x    Hexadecimal format.
+				  n    Do not write the offset.
+
+	   -j skip	     Jump over skip bytes from the beginning of the
+			     input.  od seeks past the first skip bytes in
+			     the concatenated input files.  If the combined
+			     input is not at least skip bytes long, od
+			     writes a diagnostic message to standard error
+			     and exits with a non-zero exit status.  By
+			     default, skip is interpreted as a decimal
+			     number.  If skip has a leading 0x or 0X, it is
+			     interpreted as a hexadecimal number; a leading
+			     0 indicates that skip is an octal number.
+
+			     If the value of skip is followed by a b, k, or
+			     m, it is interpreted as a multiple of 512,
+			     1024, or 1048576, respectively.
+
+	   -N count	     Format no more than count bytes of input.
+
+			     By default, count is interpreted as a decimal
+			     number.  A leading 0x or 0X indicates that
+			     count is a hexadecimal number; a leading 0
+			     identifies an octal value.
+
+			     If count bytes of input are not available
+			     (after successfully skipping if -jskip is
+			     specified), the input that is available is
+			     formatted.
+
+	   -t type_string    type_string is a string defining the types to
+			     be used when writing the input data.
+
+			     The string can contain any of the following
+			     type-specification characters:
+
+				  a	  named character ,
+				  c	  character ,
+				  d	  signed decimal ,
+				  f	  floating point ,
+				  o	  octal ,
+				  u	  unsigned decimal ,
+				  x	  hexadecimal ,
+
+			     Type specification characters d, f, o, u, and x
+			     can be followed by an optional unsigned decimal
+			     integer specifying the number of bytes to be
+			     transformed by each instance of the output
+			     type, or by an optional C, S, I, or L
+			     indicating that the conversion should be
+			     applied to an item of type char, short, int, or
+			     long, respectively.
+
+			     Type specification character f can be followed
+			     by an optional F, D, or L indicating that the
+			     conversion should be applied to an item of type
+			     float, double, or long double, respectively.
+
+			     Multiple types can be concatenated within the
+			     same type_string and multiple -t options can be
+			     specified.	 Output lines are written for each
+			     type specified in the order in which the type
+			     specification characters appear.
+
+	   -v		     Write all input data.  Without the -v option,
+			     any number of groups of output lines, that
+			     would be identical to the immediately preceding
+			     group of output lines (except for the byte
+			     offsets), are replaced with a line containing
+			     only an asterisk (*).
+
+	   file		 Pathname of one or more input files to be
+			     processed.	 If file is not specified, the
+			     standard input is used.
+
+			     Input files can be any file type.
+
+ DESCRIPTION OF PRE-POSIX USAGE
+      od and xd dump file in one or more formats as selected by the first
+      argument.	 If the first argument is missing, the default is -o for od;
+      -x for xd.  An offset field is inserted at the beginning of each line.
+      For od, the offset is in octal, for xd, the offset is in hexadecimal.
+
+    Options
+      od and xd recognize the following format options:
+
+	   -b	 Interpret bytes in octal (hexadecimal).
+
+	   -c	 Interpret bytes in ASCII.  Certain non-graphic characters
+		 appear as C escapes: null=\0, backspace=\b, form-feed=\f,
+		 new-line=\n, return=\r, tab=\t; others appear as 3-digit
+		 octal numbers.
+
+	   -d	 Interpret 16-bit words in decimal.
+
+	   -o	 Interpret 16-bit words in octal.
+
+	   -s	 Interpret 16-bit words in signed decimal.
+
+	   -x	 Interpret 16-bit words in hexadecimal.
+
+      file specifies which file is to be dumped.  If file is not specified,
+      the standard input is used.
+
+      offset specifies the offset in the file where dumping is to commence,
+      and is normally interpreted as octal bytes.  Interpretation can be
+      altered as follows:
+
+	   +	 offset must be preceded by + if the file argument is
+		 omitted.
+	   +	 offset preceded by 0x is interpreted in hexadecimal.
+	   +	 offset followed by . is interpreted in decimal.
+	   +	 offset followed by b is interpreted in blocks of 512 bytes.
+
+      Dumping continues until end-of-file.
+
+ EXAMPLES
+      Write hexadecimal bytes and the corresponding octal values to the
+      standard output in blocks of 16 bytes in one line, by transforming the
+      data from the input file file1:
+
+	   od -tx1oC file1
+
+      The following commands write one line each of the types character,
+      signed decimal integer, and float, in the order given, transforming
+      100 bytes of data starting from fifteenth byte offset in the file
+      file1:
+
+	   od -j14 -N100 -tc -tdfF file1
+	   od -j0xe -N100 -tcd4fF file1
+
+      Write one line each of the types unsigned integer, named character,
+      and long double, with the offsets written in hexadecimal and forcing a
+      write, even on lines that are identical to the immediately preceding
+      group of output lines:
+
+	   od -v -Ax -tuafL file1
+
+ WARNINGS
+      When the output format is of floating-point type; i.e., when using the
+      -t fD, -t fL, or -t f options:
+
+	   +  If the input bytes cannot be transformed into a valid floating
+	      point number, a floating point exception might occur.  In that
+	      case, the output is printed as a string containing some non-
+	      numeric characters and program execution continues.
+
+	   +  When the number of input bytes used for transformation is set
+	      to 1 with the type specifier characters d, o, u, or x, only
+	      the least-significant seven bits of each byte are used.
+
+	   +  When one or more of the -A, -j, -N, or -t options is
+	      specified, an operand starting with the first character as a
+	      plus-sign (+) or the first character as numeric is interpreted
+	      as a file name.
+
+      (XPG4 only. Multiple types can be specified by using multiple -bcdox
+      options. Output lines are written for each type specified in the order
+      in which the types are specified.)
+
+ EXTERNAL INFLUENCES
+    Environment Variables
+      LANG provides a default value for the internationalization variables
+      that are unset or null. If LANG is unset or null, the default value of
+      "C" (see lang(5)) is used. If any of the internationalization
+      variables contains an invalid setting, od will behave as if all
+      internationalization variables are set to "C".  See environ(5).
+
+      LC_ALL If set to a non-empty string value, overrides the values of all
+      the other internationalization variables.
+
+      LC_CTYPE determines the interpretation of text as single and/or
+      multi-byte characters, the classification of characters as printable,
+      and the characters matched by character class expressions in regular
+      expressions.
+
+      LC_MESSAGES determines the locale that should be used to affect the
+      format and contents of diagnostic messages written to standard error
+      and informative messages written to standard output.
+
+      NLSPATH determines the location of message catalogues for the
+      processing of LC_MESSAGES.
+
+    International Code Set Support
+      Single- and multi-byte character code sets are supported.	 Multi-byte
+      data is displayed as multi-byte values.
+
+ RETURN VALUE
+      Exit values are:
+
+       0   Successful completion.
+      >0   Error condition occurred.
+
+ SEE ALSO
+      adb(1).
+
+ STANDARDS CONFORMANCE
+      od: SVID2, SVID3, XPG2, XPG3, XPG4, POSIX.2

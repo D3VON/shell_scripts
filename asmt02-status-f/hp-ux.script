@@ -1,0 +1,114 @@
+Script started on Mon Mar  1 10:08:26 2004
+bash-2.04$ echo this is my hp-ux script for status
+this is my hp-ux script for status
+bash-2.04$ echo by Devon McBride
+by Devon McBride
+bash-2.04$ status -f tempo
+ -----------------------------------------------------------------------
+                     Information about the file 'tempo' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rw-------
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+                  File's size in bytes: 425
+              File's size in 1k blocks: 4
+bash-2.04$ status -f testdir
+ -----------------------------------------------------------------------
+                     Information about the directory 'testdir' 
+ -----------------------------------------------------------------------
+                              filetype: directory
+                           permissions: rwx------
+              Number of subdirectories: 1
+                    Owner of directory: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+         Directory's size in 1k blocks: 4
+bash-2.04$ cd ../test_items/
+bash-2.04$ ll
+total 36
+drwxr-xr-x   3 dmcbri01   b20025          96 Feb 28 20:10 dir1
+-rw-r--r--   3 dmcbri01   b20025          31 Feb 27 02:49 hrdLnk_tempo
+-rwx------   1 dmcbri01   b20025       10705 Mar  1 09:45 status
+-rw-r--r--   3 dmcbri01   b20025          31 Feb 27 02:49 tempo
+lrwx------   1 dmcbri01   b20025           5 Feb 28 20:04 temporary -> tempo
+bash-2.04$ status -f temporary
+ -----------------------------------------------------------------------
+                     Information about the file 'temporary' 
+ -----------------------------------------------------------------------
+                              filetype: symbolic link
+                           permissions: rwx------
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+bash-2.04$ status -f /dev/tunip2
+ -----------------------------------------------------------------------
+                     Information about the file '/dev/tunip2' 
+ -----------------------------------------------------------------------
+                              filetype: character special file
+                           permissions: rw-------
+                  Number of references: 1
+                         Owner of file: root (uid=0)
+                      File is in group: root (gid=0)
+                   Major device number: 138
+                   Minor device number: 0x000082
+bash-2.04$ status -f /dev/root
+ -----------------------------------------------------------------------
+                     Information about the file '/dev/root' 
+ -----------------------------------------------------------------------
+                              filetype: block special file
+                           permissions: rw-r-----
+                  Number of references: 1
+                         Owner of file: bin (uid=2)
+                      File is in group: sys (gid=3)
+                   Major device number: 64
+                   Minor device number: 0x000003
+bash-2.04$ status -f asdf
+status: error: asdf isnt a valid file.  It doesnt seem to exist.
+bash-2.04$ cd ../executables/testdir
+bash-2.04$ ls
+file1   qwer    status
+bash-2.04$ status -f
+ -----------------------------------------------------------------------
+                     Information about the file 'file1' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rw-------
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+                  File's size in bytes: 0
+              File's size in 1k blocks: 0
+ -----------------------------------------------------------------------
+                     Information about the directory 'qwer' 
+ -----------------------------------------------------------------------
+                              filetype: directory
+                           permissions: rwx------
+              Number of subdirectories: 0
+                    Owner of directory: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+         Directory's size in 1k blocks: 0
+ -----------------------------------------------------------------------
+                     Information about the file 'status' 
+ -----------------------------------------------------------------------
+                              filetype: regular file
+                           permissions: rwx------
+                  Number of references: 1
+                         Owner of file: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+                  File's size in bytes: 10705
+              File's size in 1k blocks: 24
+bash-2.04$ status -f ..
+ -----------------------------------------------------------------------
+                     Information about the directory '..' 
+ -----------------------------------------------------------------------
+                              filetype: directory
+                           permissions: rwx------
+              Number of subdirectories: 2
+                    Owner of directory: dmcbri01 (uid=20616)
+                      File is in group: b20025 (gid=557)
+         Directory's size in 1k blocks: 4
+bash-2.04$ exit
+exit
+
+script done on Mon Mar  1 10:13:52 2004

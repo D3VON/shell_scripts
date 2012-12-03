@@ -1,0 +1,136 @@
+Here are the answers to the sample problems for the 
+AdminBasics2 exercise set. Each problem is separated from
+the others by a line of dashes, so you can find it easily.
+THESE PROBLEMS ARE DIFFICULT. Don't be discouraged!
+--------------------------------------------------
+Sample file problem -
+The output from the file basics/filetypes/macbin is
+macbin: Macintosh MacBinary data, type "JPEG", creator "8BIM" (Adobe Photoshop)
+
+First, we use the rule
+122     beshort&0xFCFF  0x8081          Macintosh MacBinary data
+This takes the two successive byte (MSB or Big-Endian) at offset
+122 (decimal)=172 (octal):
+$ od -tx1 macbin | head -40
+0000000 00 0e 53 54 4f 52 45 20 53 49 47 4e 2e 6a 70 67
+0000020 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+*
+0000100 00 4a 50 45 47 38 42 49 4d 05 00 00 b2 00 7f 00
+0000120 00 00 00 00 03 8c a9 00 00 07 0c b7 32 a4 90 b7
+0000140 32 a4 96 00 00 00 6d 42 49 4e 00 00 00 00 00 00
+0000160 00 00 00 00 00 00 00 00 00 00 82 81 f6 22 00 00 <- this line!
+0000200 ff d8 ff e0 00 10 4a 46 49 46 00 01 02 01 00 c8
+The result as a beshort is 0x8281. When we and it with FCFF
+we get 0x8081, which matches and "Macintosh MacBinary data" is output.
+
+The subordinate rule
+>65     string          x               \b, type "%4.4s"
+goes to offset 65(decimal) = 101(octal) to get a four-character
+string:
+$ od -tc macbin | head -40
+0000000  \0 016   S   T   O   R   E       S   I   G   N   .   j   p   g
+0000020  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+*
+0000100  \0   J   P   E   G   8   B   I   M 005  \0  \0 262  \0 177  \0 
+              ^ here
+The output result is begun with a backspace to delete the space
+that file normally outputs between rule matches, followed by ", type ",
+then the 4-byte string that was found surrounded by quotes: "JPEG"
+
+The last two subordinate rules that match look at the characters immediately
+following the last, at offset 69(decimal)=105(octal). The string
+(looking above) is 8BIM, which matches the following rule as well and
+causes the interpretation of 8BIM to be output "(Adobe Photoshop)". Here
+is the section of magic that contains those rules (with comments intact).
+>69     string          x               \b, creator "%4.4s"
+                                                                                
+# Somewhere, Apple has a repository of registered Creator IDs.  These are
+# just the ones that I happened to have files from and was able to identify.
+                                                                                
+>69     string          8BIM            (Adobe Photoshop)
+-----------------------------------------------------
+
+file problem #1 -
+   The different cpio files are identified by the characters at the beginning
+of the file. The three files were the following type:
+$ file cpio*
+cpio0: cpio archive
+cpio1: byte-swapped cpio archive
+cpio2: ASCII cpio archive (SVR4 with CRC)
+
+The portion of /usr/share/magic that governs this is below:
+0       short           070707          cpio archive
+0       short           0143561         byte-swapped cpio archive
+0       string          070707          ASCII cpio archive (pre-SVR4 or odc)
+0       string          070701          ASCII cpio archive (SVR4 with no CRC)
+0       string          070702          ASCII cpio archive (SVR4 with CRC)
+
+The files' first characters (as revealed by od) are:
+od -to2 cpio0
+0000000 070707 004023 107560 100775 000764 000764 000001 001500
+od -to2 cpio1
+0000000 143561 000400 001000 166601 124015 150000 000400 000000
+$ od -tc cpio2 | head -1
+0000000   0   7   0   7   0   2   0   0   0   3   8   f   7   0   0   0
+
+cpio0 is identified as 'cpio archive', 'cause its first two bytes are 070707
+
+cpio1 is identified as 'byte-swapped cpio archive', 'cause its first two 
+bytes are 0143561
+
+cpio2 is identified as ' ASCII cpio archive (SVR4 with CRC)', 'cause its 
+first few bytes are a string and the first six characters are "070702"
+
+The dummy file we created simply had two bytes whose value were 0x71
+and 0xc7 (when read as a short in native byte order this is 0xc771 or
+0143561 (octal). This is the same as cpio1, so the file is identified
+as  "byte-swapped cpio archive"
+
+------------------------------------------------------
+file problem #2 -
+You were supposed to output a set of instructions to indicate how file
+identified the file foreign as 
+$ file foreign
+foreign: PA-RISC1.1 shared executable dynamically linked - not stripped
+
+Your instructions were supposed to identify the byte offset and the value 
+of the quantity in LINUX-BYTE-ORDER that caused the corresponding part 
+of the message to be output. I started it:
+At offset 00
+    the 4-byte hex value 0x08011002 indicates "PA-RISC1.1 shared executable"
+Here is the rest:
+At offset 168 (0250 octal)
+    the 0x04000000 bit on in the four-byte value 0x04000000 indicates 
+        "dynamically linked"
+At offset 96 (0140 octal)
+    the non-zero value of the four-byte value 0x80000000 indicates
+        "- not stripped"
+
+----------------------------------------------------------------
+symbol problem -
+The idea was to find a program in /bin that would not run if /usr was
+not mounted because it relied on something in /usr. One thing that
+would certainly cause this is relying on a shared library whose actual file
+is on /usr. This is true on linux of the rpm command, as seen by ldd:
+ldd rpm
+        librpm-4.2.so => /usr/lib/librpm-4.2.so (0x40027000)
+        librpmdb-4.2.so => /usr/lib/librpmdb-4.2.so (0x4007b000)
+        librpmio-4.2.so => /usr/lib/librpmio-4.2.so (0x4015a000)
+        libpopt.so.0 => /usr/lib/libpopt.so.0 (0x401b9000)
+        libelf.so.1 => /usr/lib/libelf.so.1 (0x401c1000)
+        libpthread.so.0 => /lib/tls/libpthread.so.0 (0x401d1000)
+        librt.so.1 => /lib/tls/librt.so.1 (0x401df000)
+        libbz2.so.1 => /usr/lib/libbz2.so.1 (0x401f1000)
+        libc.so.6 => /lib/tls/libc.so.6 (0x42000000)
+        /lib/ld-linux.so.2 => /lib/ld-linux.so.2 (0x40000000)
+
+The tricky part was to get this information easily. You could do a loop
+like this:
+        cd /bin
+        for s in *; do
+            if ldd $s | grep -q '/usr' 2>/dev/null; then
+                echo "$s relies on /usr"
+            fi
+        done
+        TRY IT!
+--------------------------------------------------------------------

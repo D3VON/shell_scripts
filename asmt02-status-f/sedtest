@@ -1,0 +1,10 @@
+#!/bin/bash
+
+field1="-rwxr-x---"
+
+
+filetype=`echo $field1 | sed 's/r.*$//'`
+symbolperms=`echo $field1 | sed 's/^.//'`
+
+echo $filetype
+echo $symbolperms

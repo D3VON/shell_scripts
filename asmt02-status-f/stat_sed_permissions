@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#returns the octal permission for the file given as an cmmd ln arg.
+#only works on Linux :^D
+
+# remember to give an arg for $1
+
+octalperms=`stat --format=%a $1`
+
+echo $octalperms
